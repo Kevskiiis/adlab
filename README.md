@@ -1,436 +1,558 @@
-# Small Business IT Infrastructure & Active Directory Lab
+# Stark Panels & Publishing — Active Directory Lab
+
+A hands-on Windows Server and Active Directory lab demonstrating practical IT infrastructure, systems administration, identity management, access control, Group Policy, file services, troubleshooting, and automation skills.
+
+---
 
 ## 1. Project Overview
 
-### Project Summary
+This project simulates the IT infrastructure of a small business using Windows Server, Active Directory Domain Services (AD DS), DNS, Group Policy, and Windows client machines.
 
-This project involves designing, implementing, securing, and maintaining a centralized Windows IT environment for a fictional small business with 20 employees.
+The objective is to build and administer a centralized Windows domain environment that supports employee accounts, workstation management, departmental file storage, and controlled administrative access.
 
-The lab simulates the responsibilities of a systems administrator who manages the company's IT infrastructure, including user accounts, Windows workstations, file storage, access permissions, security policies, and routine administrative operations.
+Rather than configuring Active Directory in isolation, this lab focuses on common responsibilities performed by IT support technicians, systems administrators, and infrastructure engineers.
 
-The environment is built around Microsoft Active Directory Domain Services (AD DS), providing centralized identity management and a foundation for consistent security and workstation administration.
+### Skills Demonstrated
 
-The project emphasizes practical systems administration rather than simply installing and configuring individual services. Each component is implemented to address a specific business requirement, and its functionality is validated through hands-on testing.
+- Active Directory Domain Services administration
+- Organizational Unit (OU) design and management
+- User account lifecycle management
+- Security group design and access control
+- Group Policy configuration and troubleshooting
+- DNS and domain connectivity troubleshooting
+- SMB file sharing and NTFS permissions
+- Delegated administration and least privilege
+- PowerShell administration and automation
+- Windows security auditing and Event Viewer
+- Backup, recovery, and operational documentation
+- Technical documentation and infrastructure design
 
-The lab uses an existing Active Directory domain:
+### Technologies
 
-`ad.comics.internal`
-
-The domain will support the fictional company's identity and infrastructure management requirements.
-
-### Project Objectives
-
-- Manage a centralized Active Directory domain.
-- Design an appropriate Organizational Unit (OU) structure.
-- Establish consistent user and computer account management procedures.
-- Implement security groups and role-based access controls.
-- Configure a Windows file server with departmental shared folders.
-- Enforce workstation security settings through Group Policy.
-- Implement delegated administration and least-privilege access.
-- Troubleshoot common DNS, authentication, Group Policy, and file access issues.
-- Automate repetitive administrative tasks using PowerShell.
-- Configure and validate appropriate Windows security auditing.
-- Develop backup, recovery, and operational documentation.
-- Document the environment in a way that another administrator can understand and maintain.
-
-**Target roles:** Junior Systems Administrator, IT Administrator, Windows Systems Administrator, IT Support Technician.
-
-**Environment:** Virtualized Windows Server and Windows client machines.
-
-**Primary technologies:** Active Directory Domain Services, DNS, Group Policy, Windows Server, SMB file sharing, NTFS permissions, PowerShell, Windows Event Viewer, and Remote Server Administration Tools (RSAT).
+| Technology | Purpose |
+|---|---|
+| Windows Server | Hosts the domain controller and lab file services |
+| Active Directory Domain Services | Centralized identity and domain management |
+| DNS | Domain name resolution and service discovery |
+| Group Policy | Centralized configuration and security enforcement |
+| Windows client machines | Simulate employee workstations |
+| SMB | Network file sharing |
+| NTFS permissions | File and folder access control |
+| PowerShell | Administrative automation and reporting |
+| Event Viewer | Troubleshooting and security auditing |
+| RSAT | Remote administration tools, if installed on a client |
 
 ---
 
-## 2. Business Scenario: Panel & Pixel Comics
+## 2. Business Scenario
 
-### Company Background
+### Company: Stark Panels & Publishing
 
-Panel & Pixel Comics is a fictional small business specializing in comic book retail, independent comic publishing, and original merchandise.
+Stark Panels & Publishing is a fictional comic book publishing and retail company with approximately 20 employees.
 
-The company has recently opened its first office and retail location. Its 20 employees work across several business functions, including management, retail operations, publishing, and IT support.
+The company has several departments that need access to different files, applications, and administrative resources.
 
-As the business grows, management wants to establish a centralized IT environment that supports employee productivity, protects company information, and reduces the amount of manual administration required.
+As the company grows, managing individual computers and user accounts becomes increasingly difficult. The organization needs a centralized infrastructure to manage identities, enforce security policies, and control access to company resources.
 
-The company has hired a systems administrator to establish and maintain its internal Windows infrastructure.
-
-You are responsible for designing, implementing, documenting, and supporting this environment.
-
-### Company Profile
-
-| Attribute | Description |
-|---|---|
-| Company | Panel & Pixel Comics |
-| Industry | Comic book retail and publishing |
-| Employees | 20 |
-| Locations | One primary office and retail location |
-| IT staffing | One systems administrator |
-| Primary client systems | Windows workstations |
-| Identity platform | Active Directory Domain Services |
-| Active Directory domain | `ad.comics.internal` |
-| File storage | Centralized Windows file server |
-| Network environment | Private business network |
-| IT operating model | Centrally managed Windows infrastructure |
-
-### Employee Distribution
-
-The company has four business functions.
+### Organizational Structure
 
 | Department | Employees | Responsibilities |
 |---|---:|---|
-| Management | 2 | Business decisions, finances, and personnel oversight |
-| Retail Operations | 8 | Inventory, sales, customer service, and store operations |
-| Publishing & Creative | 7 | Comic production, artwork, publishing, and marketing |
-| IT & Administration | 3 | Technical support, infrastructure, and administrative operations |
+| Management | 2 | Business operations and company oversight |
+| Retail Operations | 8 | Retail locations, sales operations, and inventory |
+| Publishing & Creative | 7 | Comic production, artwork, and publishing |
+| IT & Administration | 3 | Technical support and internal administration |
 | **Total** | **20** | |
 
-Although the company has 20 employees, the lab will use a smaller set of representative accounts to demonstrate the required administrative functionality.
+The lab will use a small representative set of accounts rather than creating all 20 employee accounts. This keeps the environment manageable while still demonstrating the administrative tasks required in a larger organization.
 
-You do not need to create all 20 employee accounts to demonstrate the design.
+### Business Requirements
 
-### Current Business Challenges
+The company needs to:
 
-As the company's first systems administrator, you have identified several infrastructure requirements.
+1. Centralize employee authentication through Active Directory.
+2. Organize users and computers into a maintainable directory structure.
+3. Apply consistent security settings to domain-joined computers.
+4. Restrict access to departmental files based on job responsibilities.
+5. Allow IT support personnel to perform approved administrative tasks without granting unrestricted domain privileges.
+6. Automate repetitive administrative tasks.
+7. Investigate authentication, DNS, Group Policy, and file-access problems.
+8. Maintain operational documentation and demonstrate recovery procedures.
 
-**1. Centralized Identity Management**
+### Project Objective
 
-Employees need individual accounts to authenticate to company workstations and access internal resources. Accounts must be created and maintained consistently.
-
-**2. Departmental Data Protection**
-
-The publishing team works with original artwork, scripts, and unpublished content. Management maintains sensitive business records. These resources must not be accessible to every employee.
-
-**3. Shared Business Resources**
-
-Employees need centralized access to department-specific documents, templates, and other working files.
-
-**4. Consistent Workstation Configuration**
-
-The company needs a standard approach to configuring Windows workstations and applying appropriate security settings.
-
-**5. Controlled Administrative Access**
-
-The systems administrator needs sufficient privileges to manage the infrastructure. Routine support activities should not require unrestricted domain privileges.
-
-**6. Reliable IT Operations**
-
-The company needs documented procedures for common issues, including account lockouts, failed logins, inaccessible file shares, and Group Policy problems.
-
-**7. Data Protection and Recovery**
-
-Management expects important business documents to be recoverable after accidental deletion or other failures.
-
-### Business Goal
-
-Establish a secure, maintainable Windows domain environment that supports the company's 20 employees without introducing unnecessary complexity or administrative overhead.
-
-The solution must be appropriate for a small business while demonstrating sound systems administration practices.
+Build a working lab that demonstrates how a small business can use Windows infrastructure to manage employees, computers, permissions, and routine IT operations.
 
 ---
 
-## 3. Project Scope
+## 3. Project Scope and Infrastructure Constraints
 
-### In Scope
+This lab is designed to run locally on a laptop using the available virtual machines and hardware.
 
-The project includes:
+### Current Environment
 
-- Active Directory domain administration.
-- DNS configuration and troubleshooting.
-- OU and security group design.
-- User account lifecycle management.
-- Domain-joined workstation management.
-- Windows file server configuration.
-- SMB sharing and NTFS permissions.
-- Group Policy configuration and troubleshooting.
-- Delegated administration.
-- Privileged account separation.
-- PowerShell administration and automation.
-- Windows security auditing.
-- Backup and recovery procedures.
-- Infrastructure troubleshooting.
-- Operational documentation.
+| Component | Configuration |
+|---|---|
+| Domain | `ad.comics.internal` |
+| Primary server | `DC01` — logical hostname used in this documentation |
+| Server roles | AD DS, DNS, and file services |
+| Client machines | `CLIENT01` and `CLIENT02` |
+| Directory services | Active Directory |
+| File sharing | SMB shares with NTFS permissions |
+| Administration | Server management tools and optional RSAT |
+| Workstations | Two Windows client machines |
 
-### Out of Scope
+The hostname `DC01` is a logical name used throughout this README. If the actual server hostname differs, substitute the correct hostname in commands, paths, and configuration.
 
-The initial implementation does not require:
+### Lab Constraints
 
-- A geographically distributed enterprise network.
-- Multiple office locations.
-- Enterprise-wide endpoint detection and response.
-- A production SIEM deployment.
-- Publicly accessible domain controllers.
-- Complex enterprise identity federation.
-- High-availability clustering.
-- A large fleet of physical workstations.
-- A complete cloud infrastructure deployment.
+The environment uses a single Windows Server for both domain controller and file server responsibilities.
 
-These capabilities may be explored as future enhancements.
+This is a deliberate lab constraint, not a recommended production design.
 
-### Implementation Philosophy
+Combining these roles allows the project to demonstrate domain administration and file services without requiring additional server hardware or licenses.
 
-The infrastructure should remain simple enough for one administrator to maintain while incorporating security and operational practices that would be appropriate in a real business.
+The environment does not currently include:
 
-The goal is not to recreate an enterprise environment with unnecessary complexity. The goal is to implement the core services a small business needs and demonstrate that they work correctly.
+- A dedicated administrative workstation.
+- A secondary domain controller.
+- A separate file server.
+- A separate server for monitoring or centralized logging.
+
+These can be introduced as future enhancements.
+
+### Production Considerations
+
+In a production environment, domain controllers should generally not host general-purpose file shares or unrelated application workloads.
+
+Separating these roles helps reduce the impact of a compromised service, limits administrative exposure, and allows each server role to be maintained independently.
+
+A production environment would also require appropriate backup, recovery, availability, and monitoring arrangements.
 
 ---
 
 ## 4. Infrastructure Architecture
 
-### Proposed Environment
-
-The lab will use a small number of virtual machines to represent the company's core IT infrastructure.
-
-| System | Role | Responsibilities |
-|---|---|---|
-| `DC01` | Domain Controller | Active Directory, DNS, authentication, and Group Policy support |
-| `FILE01` | File Server | Departmental file storage and access control |
-| `CLIENT01` | Windows Workstation | General employee account and Group Policy testing |
-| `CLIENT02` | Windows Workstation | Additional user, department, and access-control testing |
-| `ADMIN01` | Optional Administration Workstation | Remote administration using RSAT |
-
-The existing Windows Server hosting Active Directory will serve as `DC01` conceptually, even if its current hostname differs.
-
-The proposed system names are logical labels. Rename existing machines only if there is a clear reason to do so.
-
-`ADMIN01` is optional. The initial project can be completed without a dedicated administration workstation.
-
-### Infrastructure Design
-
-The intended logical architecture is:
+### Logical Architecture
 
 ```text
-                  Panel & Pixel Comics
-                           |
-                           |
-                 Active Directory Domain
+                    Stark Panels & Publishing
+                               |
+                               |
                     ad.comics.internal
-                           |
-                           v
-                         DC01
-                  Active Directory + DNS
-                           |
-             +-------------+-------------+
-             |             |             |
-             v             v             v
-          CLIENT01      CLIENT02       FILE01
-          Windows       Windows        File Server
-          Workstation   Workstation        |
-                                           |
-                                  Departmental Shares
-                                           |
-                         +-----------------+----------------+
-                         |                 |                |
-                         v                 v                v
-                    Management          Retail         Publishing
-                                         Ops            & Creative
+                               |
+                       +---------------+
+                       |     DC01      |
+                       |---------------|
+                       | AD DS         |
+                       | DNS           |
+                       | File Services |
+                       +---------------+
+                               |
+                  +------------+------------+
+                  |                         |
+           +-------------+           +-------------+
+           |  CLIENT01   |           |  CLIENT02   |
+           |-------------|           |-------------|
+           | Windows     |           | Windows     |
+           | Workstation |           | Workstation |
+           +-------------+           +-------------+
 ```
 
-This is a logical diagram, not a complete network topology. Network addressing, virtual switches, routing, and firewall configuration will be documented separately where relevant.
+### Component Responsibilities
 
-### Infrastructure Requirements
+**DC01 — Domain Controller and File Server**
 
-The environment must:
+- Hosts Active Directory Domain Services.
+- Provides DNS for the Active Directory domain.
+- Authenticates domain users and computers.
+- Stores the directory objects used by the lab.
+- Hosts departmental SMB file shares.
+- Provides a platform for testing domain administration and file access.
 
-1. Maintain reliable domain and DNS functionality.
-2. Allow domain-joined clients to locate a domain controller.
-3. Support centralized user authentication.
-4. Provide access to departmental file shares.
-5. Apply intended Group Policy settings to the appropriate users or computers.
-6. Restrict administrative access to authorized accounts.
-7. Support documented troubleshooting and recovery procedures.
+**CLIENT01 — Employee Workstation**
 
-### DNS Requirements
+- Joins the Active Directory domain.
+- Tests user authentication.
+- Receives applicable Group Policy settings.
+- Tests access to departmental resources.
 
-Domain-joined clients must use DNS infrastructure capable of resolving the Active Directory domain and its service records.
+**CLIENT02 — Employee Workstation**
 
-Configure client DNS settings to point to the appropriate internal DNS server.
+- Joins the Active Directory domain.
+- Tests a different user's access permissions.
+- Helps verify that access restrictions work across multiple client machines.
 
-External name resolution should be handled through DNS forwarding or another appropriate internal DNS configuration.
+### DNS Configuration
 
-Do not configure public DNS servers directly as alternate DNS servers on domain clients as a workaround for internal DNS issues.
+Domain-joined clients should use the internal DNS server that can resolve the Active Directory domain and its service records.
+
+For this lab, that normally means configuring clients to use the DNS service hosted on `DC01`.
+
+Do not configure a public DNS server as a direct alternate DNS server on domain clients. Public DNS servers do not know the private Active Directory DNS records needed for domain discovery and authentication.
+
+If internet name resolution is required, configure appropriate DNS forwarding on the internal DNS server.
+
+### Example Domain Information
+
+| Setting | Example |
+|---|---|
+| Domain FQDN | `ad.comics.internal` |
+| NetBIOS domain name | `AD` |
+| Domain controller hostname | `DC01` |
+| Domain controller FQDN | `DC01.ad.comics.internal` |
+| Example client | `CLIENT01.ad.comics.internal` |
+| Example client | `CLIENT02.ad.comics.internal` |
+
+The NetBIOS name should be verified in the actual domain configuration rather than assumed if the domain was created differently.
 
 ---
 
-## 5. Active Directory Organizational Structure
+## 5. Active Directory OU Structure
 
-### Business Requirement
+The Active Directory environment uses Organizational Units (OUs) to organize directory objects by object type, location, and department.
 
-The company needs an organized directory structure that supports account administration, workstation management, and targeted Group Policy deployment.
+This design supports consistent Group Policy application, easier administration, and future expansion.
 
-The structure should be easy for a single administrator to understand and maintain.
+### OU Hierarchy
 
-### Proposed OU Structure
+The current OU hierarchy is organized as follows:
 
 ```text
 ad.comics.internal
-│
-├── OU=PanelAndPixel
-│   │
-│   ├── OU=Users
-│   │   ├── OU=Management
-│   │   ├── OU=Retail
-│   │   ├── OU=Publishing
-│   │   └── OU=IT
-│   │
-│   ├── OU=Workstations
-│   │   ├── OU=Management
-│   │   ├── OU=Retail
-│   │   ├── OU=Publishing
-│   │   └── OU=IT
-│   │
-│   ├── OU=Servers
-│   │
-│   └── OU=Administrative Accounts
-│
-└── Default Active Directory containers
+|
++-- Computers
+|   |
+|   +-- Workstations
+|   |   |
+|   |   +-- <Location>
+|   |
+|   +-- Servers
+|       |
+|       +-- <Location>
+|
++-- Users
+    |
+    +-- <Location>
+        |
+        +-- Departments
+            |
+            +-- Management
+            |
+            +-- Retail Operations
+            |
+            +-- Publishing & Creative
+            |
+            +-- IT & Administration
 ```
 
-The proposed structure should be adapted to the existing directory.
+**Note:** Laptops are not currently included in the hierarchy. A `Laptops` OU can be added later if needed.
 
-Service accounts do not need their own OU until the lab introduces services that require them.
+The `<Location>` entries represent the location OUs that exist in the actual environment. Replace the placeholder with the exact OU name when documenting a specific distinguished name.
 
-### OU Requirements
+### Computer OU Design
 
-- Separate user objects from computer objects.
-- Organize users by department.
-- Organize workstations according to the intended policy design.
-- Maintain a clear location for privileged administrative accounts.
-- Keep member servers organized separately from ordinary workstations.
-- Document the purpose of each OU.
-- Avoid unnecessary changes to default Active Directory containers.
+| OU | Purpose |
+|---|---|
+| `Computers` | Parent OU for computer objects managed through the custom OU structure. |
+| `Workstations` | Contains employee desktop computers and other workstation devices. |
+| `Servers` | Contains server computer objects. |
+| `<Location>` under `Workstations` | Organizes workstation computer accounts by location. |
+| `<Location>` under `Servers` | Organizes server computer accounts by location. |
+
+### User OU Design
+
+| OU | Purpose |
+|---|---|
+| `Users` | Parent OU for employee user accounts. |
+| `<Location>` under `Users` | Organizes employee accounts by location. |
+| `Departments` | Groups employees by their business department. |
+| Department OUs | Provide a place to apply department-specific user policies where appropriate. |
+
+### Example Computer Placement
+
+Assuming the location OU is named `Seattle`, the distinguished name for a workstation OU would be:
+
+```text
+OU=Seattle,OU=Workstations,OU=Computers,DC=ad,DC=comics,DC=internal
+```
+
+The equivalent server OU would be:
+
+```text
+OU=Seattle,OU=Servers,OU=Computers,DC=ad,DC=comics,DC=internal
+```
+
+These examples assume that `Computers`, `Workstations`, `Servers`, and the location entries are OUs in Active Directory.
+
+### OU Design Considerations
+
+**Separate workstations and servers**
+
+Workstations and servers have different security and operational requirements. Separating them allows different Group Policy settings to be applied where appropriate.
+
+**Organize computers by location**
+
+Location-based OUs allow the directory structure to expand as the organization adds offices or facilities.
+
+**Keep user and computer objects separate**
+
+User accounts and computer accounts have different management and policy requirements. Separate hierarchies help administrators manage each object type independently.
+
+**Use security groups for resource access**
+
+OU placement primarily supports directory organization, delegation, and Group Policy application. Security groups should generally control access to file shares and other resources.
+
+**Avoid unnecessary OU complexity**
+
+An OU should exist to support a meaningful administrative, delegation, or policy requirement. The structure should remain easy for administrators to understand.
+
+### Important: Default Computer Container
+
+Active Directory's built-in `Computers` location is a **container**, not an Organizational Unit.
+
+Your custom `OU=Computers` is different from the built-in `CN=Computers` container.
+
+Newly domain-joined computers may initially appear in the default container unless the domain's default computer container has been redirected or another placement method is used.
+
+For this lab, computers can be moved manually into the appropriate location under `Workstations` or `Servers`.
+
+Verify that each computer object is in the intended OU before testing Group Policy.
+
+### Validation
+
+The following should be verified:
+
+- User accounts are placed in their appropriate department OUs.
+- Client computer objects are placed under `Computers → Workstations → Location`.
+- Server computer objects are placed under `Computers → Servers → Location`.
+- The intended Group Policy Objects are linked to the correct OUs.
+- Users and computers receive the expected policies.
+
+---
+
+## 6. User Account Lifecycle Management
+
+User account management is one of the most common responsibilities in an Active Directory environment.
+
+This section demonstrates how accounts are created, maintained, disabled, and reviewed throughout the employee lifecycle.
+
+### Representative Test Accounts
+
+The lab uses a small number of representative employee accounts.
+
+| Account | Department | Purpose |
+|---|---|---|
+| `owner` | Management | Tests management-level access |
+| `retail1` | Retail Operations | Tests retail permissions |
+| `retail2` | Retail Operations | Tests access consistency between employees |
+| `creative1` | Publishing & Creative | Tests publishing resource access |
+| `creative2` | Publishing & Creative | Tests publishing resource access |
+| `helpdesk1` | IT & Administration | Tests delegated support tasks |
+
+These are lab account names. They should not be used as real employee credentials.
+
+Create a separate privileged administrative account for domain administration rather than using an ordinary employee account for administrative tasks.
+
+### Account Provisioning
+
+When a new employee joins the organization, the administrator should:
+
+1. Confirm the employee's identity and department.
+2. Create the user account with an approved naming convention.
+3. Place the account in the correct location and department OU.
+4. Add the account to the appropriate security groups.
+5. Configure the account's initial password using a secure process.
+6. Verify account status and required attributes.
+7. Test authentication.
+8. Verify access to the resources required for the employee's role.
+
+### Account Modification
+
+When an employee changes departments or responsibilities:
+
+1. Review the employee's existing group memberships.
+2. Remove memberships that are no longer required.
+3. Add the required new memberships.
+4. Update relevant account attributes.
+5. Verify the employee's access to required resources.
+6. Confirm that access to previous departmental resources has been removed where appropriate.
+
+### Account Offboarding
+
+When an employee leaves the organization:
+
+1. Disable the account promptly.
+2. Revoke or terminate other active access mechanisms where applicable.
+3. Review the employee's group memberships.
+4. Transfer ownership of business files where required.
+5. Preserve business data according to company policy.
+6. Document the action and its completion.
+7. Delete the account only when permitted by the organization's retention and recovery requirements.
+
+Disabling an account is generally preferable to immediately deleting it because it preserves the account object for investigation, recordkeeping, and recovery.
 
 ### Validation
 
 Demonstrate that:
 
-- Users are placed in the appropriate OUs.
-- Workstations are placed in the intended computer OUs.
-- Department-specific policies can target the appropriate workstation OUs.
-- Moving a computer to another OU changes its applicable policy scope where expected.
-- OU placement alone does not unintentionally grant resource permissions.
+- A newly created user can authenticate.
+- A user receives the correct group memberships.
+- A modified user receives the correct access after a department change.
+- A disabled user cannot authenticate normally.
+- Account changes can be investigated through available directory information and security logs.
 
 ---
 
-## 6. User Accounts and Identity Management
+## 7. Security Groups and Resource Access
 
-### Business Requirement
+Security groups provide a manageable way to assign permissions to employees based on their job responsibilities.
 
-All employees require individually identifiable accounts.
+Instead of assigning permissions individually to each employee, the administrator assigns users to groups and grants permissions to those groups.
 
-The company needs a repeatable process for creating accounts, updating employee information, modifying access, and disabling accounts when employment ends.
+### Group Design
 
-### Representative Employee Accounts
+The lab uses two general categories of security groups:
 
-Create only enough accounts to demonstrate the requirements.
+1. **Global groups:** Represent users with common job responsibilities.
+2. **Domain Local groups:** Represent access to resources within the domain.
 
-Suggested test population:
+This follows the AGDLP model:
 
-| Username | Display Name | Department | Purpose |
-|---|---|---|---|
-| `owner` | Alex Morgan | Management | Business owner and management access testing |
-| `retail1` | Taylor Reed | Retail | Standard retail employee |
-| `retail2` | Jordan Blake | Retail | Additional retail employee for group testing |
-| `creative1` | Casey Parker | Publishing | Publishing and creative resource access |
-| `creative2` | Riley Bennett | Publishing | Additional creative employee for access testing |
-| `helpdesk1` | Sam Ellis | IT | Delegated account-management testing |
-| `admin-kevin` | Lab Administrator | IT | Privileged administrative operations |
+**Accounts → Global Groups → Domain Local Groups → Permissions**
 
-These are fictional accounts for the lab. The names and usernames can be changed to suit your preferred naming convention.
-
-The account `admin-kevin` is an example privileged account name, not a recommendation to use a particular person's real name in a public repository.
-
-The existing domain administrator account may be used to establish the initial environment. Create a separate administrative account only where appropriate, and do not remove or disable essential built-in administrative access without a verified recovery plan.
-
-**Important:** The business owner does not automatically need Domain Admin privileges. Management's business responsibilities should not be confused with infrastructure administration.
-
-### Account Naming Convention
-
-Establish a documented username standard.
-
-For this lab, use a simple convention such as:
-
-`firstname.lastname`
-
-or a short username convention such as:
-
-`firstinitiallastname`
-
-The implementation must account for duplicate names and naming conflicts.
-
-### Account Provisioning Requirements
-
-When creating an employee account, the administrator must:
-
-1. Identify the employee's department.
-2. Create the account using the naming convention.
-3. Populate the display name and relevant directory attributes.
-4. Place the account in the correct OU.
-5. Add the account to the appropriate security groups.
-6. Configure initial credentials securely.
-7. Verify that the account can authenticate.
-8. Confirm that the account can access the required resources.
-9. Confirm that access to restricted resources is denied.
-
-### Account Offboarding Requirements
-
-When an employee leaves the business:
-
-1. Disable the account promptly.
-2. Review and revoke access as appropriate.
-3. Review the account's group memberships.
-4. Identify business files that must be retained.
-5. Transfer ownership or access to retained data according to business requirements.
-6. Document the action.
-7. Delete or archive the account only when appropriate.
-
-### Validation
-
-Demonstrate the lifecycle using a disposable test account.
-
-Create the account, verify authentication, modify its group membership, disable it, and verify that new domain logons are denied.
-
----
-
-## 7. Security Groups and Role-Based Access
-
-### Business Requirement
-
-Employees must receive access based on their job responsibilities.
-
-The administrator should be able to change resource access through group membership rather than editing the permissions of individual users.
-
-### Proposed Security Groups
-
-#### Department Membership Groups
+### Proposed Global Groups
 
 | Group | Purpose |
 |---|---|
 | `GG_Management` | Management employees |
-| `GG_Retail` | Retail employees |
-| `GG_Publishing` | Publishing and creative employees |
-| `GG_IT` | IT personnel |
+| `GG_Retail` | Retail Operations employees |
+| `GG_Publishing` | Publishing & Creative employees |
+| `GG_IT` | IT & Administration employees |
 
-#### Resource Permission Groups
+The `GG_` prefix identifies a Global security group.
+
+### Proposed Domain Local Groups
 
 | Group | Purpose |
 |---|---|
-| `DL_FS_Management_Modify` | Modify access to Management files |
-| `DL_FS_Retail_Modify` | Modify access to Retail files |
-| `DL_FS_Publishing_Modify` | Modify access to Publishing files |
+| `DL_FS_Management_Modify` | Modify access to management files |
+| `DL_FS_Retail_Modify` | Modify access to retail files |
+| `DL_FS_Publishing_Modify` | Modify access to publishing files |
 | `DL_FS_IT_Modify` | Modify access to IT files |
-| `DL_FS_Public_Read` | Read access to shared company resources |
+| `DL_FS_Public_Modify` | Modify access to shared company files |
 
-Additional read-only groups can be introduced when a business requirement calls for different access levels.
+The `DL_` prefix identifies a Domain Local group. The `FS_` portion indicates a file-server resource.
 
-### Group Design
+Additional read-only groups can be created if the business scenario requires different levels of access.
 
-Use the AGDLP approach where appropriate:
+### Example Group Membership
 
-- **Accounts:** Individual employees.
-- **Global groups:** Departmental membership.
-- **Domain Local groups:** Resource-specific permissions.
-- **Permissions:** Access rights assigned to files and folders.
+```text
+User: creative1
+    |
+    v
+GG_Publishing
+    |
+    v
+DL_FS_Publishing_Modify
+    |
+    v
+Publishing folder permissions
+```
 
-Example:
+An employee should receive access through the appropriate group memberships rather than through individually assigned folder permissions.
+
+### Example Access Matrix
+
+| Department | Management Files | Retail Files | Publishing Files | IT Files |
+|---|---|---|---|---|
+| Management | Modify | Denied by default | Denied by default | Denied by default |
+| Retail Operations | Denied by default | Modify | Denied by default | Denied by default |
+| Publishing & Creative | Denied by default | Denied by default | Modify | Denied by default |
+| IT & Administration | Denied by default | Denied by default | Denied by default | Modify |
+
+This is a starting policy, not an assumption that every real business should use these exact permissions. Any cross-department access should be explicitly justified and configured.
+
+Membership in `GG_IT` does not automatically grant domain administrator privileges. IT support tasks should be delegated separately and according to least privilege.
+
+### Validation
+
+Test both authorized and unauthorized access:
+
+- A publishing employee can modify publishing files.
+- A retail employee cannot modify publishing files.
+- A management employee receives the intended management access.
+- An ordinary employee cannot access IT-restricted files.
+- Access is updated when an employee's group membership changes.
+
+Document the expected result and the observed result for each test.
+
+---
+
+## 8. File Server and Departmental Storage
+
+The file server provides centralized storage for company documents.
+
+SMB provides network file sharing, while NTFS permissions control access to folders and files on the server's filesystem.
+
+Both permission layers must be configured correctly.
+
+### Proposed Directory Structure
+
+The following is an example directory structure on the server:
+
+```text
+D:\Shares
+|
++-- Management
+|
++-- Retail
+|
++-- Publishing
+|
++-- IT
+|
++-- Public
+```
+
+The `D:` drive is an example. Use the actual data volume available in the lab.
+
+If the server has only one suitable volume, a directory on that volume can be used instead.
+
+### Proposed SMB Shares
+
+| Share | Example UNC Path | Purpose |
+|---|---|---|
+| Management | `\\DC01\Management$` | Management documents |
+| Retail | `\\DC01\Retail$` | Retail documents |
+| Publishing | `\\DC01\Publishing$` | Publishing and creative files |
+| IT | `\\DC01\IT$` | IT documentation and administration files |
+| Public | `\\DC01\Public` | Documents intended for broader company access |
+
+The `$` suffix hides a share from ordinary browse listings. It does **not** provide access control or replace permissions.
+
+Access must still be controlled through SMB share permissions and NTFS permissions.
+
+### Share and NTFS Permissions
+
+Effective access is determined by the combined effect of SMB share permissions and NTFS permissions.
+
+A user must be permitted by both layers to perform the requested operation over SMB.
+
+For this lab, use a consistent permission design:
+
+- Configure share permissions to allow the intended users or groups to connect.
+- Use NTFS permissions to enforce department-specific access.
+- Assign permissions to security groups rather than individual users wherever practical.
+- Avoid granting broad access to `Everyone` or `Authenticated Users` without a deliberate reason.
+- Verify that inherited permissions do not unintentionally grant access.
+
+A straightforward lab design is to grant the intended authenticated users or groups sufficient share-level access and use NTFS permissions to enforce the departmental restrictions. The exact configuration should be documented.
+
+### Example: Publishing Share
+
+The intended access path is:
 
 ```text
 creative1
@@ -442,779 +564,841 @@ GG_Publishing
 DL_FS_Publishing_Modify
     |
     v
-\\FILE01\Publishing$
+NTFS permissions on D:\Shares\Publishing
+    |
+    v
+\\DC01\Publishing$
 ```
 
-This structure allows employees to change departments without requiring the administrator to redesign every resource ACL.
+The share-level permissions must also permit the required operations.
 
-### Requirements
+### Access Testing
 
-- Use security groups to manage resource access.
-- Avoid assigning file permissions directly to individual employees.
-- Keep departmental membership groups separate from resource permission groups.
-- Document the purpose of each group.
-- Review memberships when employee responsibilities change.
-- Avoid unnecessary administrative group memberships.
+Use both client machines to test different user accounts.
 
-### Validation
+| Test | Expected Result |
+|---|---|
+| `creative1` opens the Publishing share | Allowed |
+| `creative1` creates or modifies an authorized test file | Allowed |
+| `retail1` attempts to modify Publishing files | Denied |
+| `retail1` accesses the Retail share | Allowed |
+| An ordinary employee accesses IT-restricted files | Denied |
+| An authorized user accesses Public files | Allowed |
 
-Use the representative employee accounts to confirm that:
+Record screenshots or command output showing the results.
 
-- Publishing employees can access publishing files.
-- Retail employees can access retail files.
-- Employees cannot access restricted departmental folders without authorization.
-- Changes to group membership affect resource access as intended.
-- The IT account has only the administrative access required for its responsibilities.
+### Production Considerations
 
----
+In production, the file server would generally be a separate server rather than the domain controller.
 
-## 8. File Server and Shared Storage
+Separating file services from domain services reduces the impact of compromise and simplifies independent maintenance, backup, and capacity planning.
 
-### Business Requirement
-
-Panel & Pixel Comics relies on shared files for daily business operations.
-
-The company needs a centralized location for departmental documents, unpublished creative work, operational records, and common resources.
-
-The file server must protect business data while allowing employees to collaborate.
-
-### File Server Requirements
-
-Configure `FILE01` as a domain-joined member server.
-
-The server must:
-
-- Host departmental file shares.
-- Support SMB access from domain-joined clients.
-- Use group-based permissions.
-- Apply appropriate NTFS access controls.
-- Restrict sensitive business information.
-- Provide a common area for approved shared resources.
-- Support permission testing and troubleshooting.
-
-### Proposed Directory Structure
-
-```text
-D:\Shares
-│
-├── Management
-├── Retail
-├── Publishing
-├── IT
-└── Public
-```
-
-Example network paths:
-
-```text
-\\FILE01\Management$
-\\FILE01\Retail$
-\\FILE01\Publishing$
-\\FILE01\IT$
-\\FILE01\Public
-```
-
-The dollar sign hides a share from ordinary network browsing but does not secure the underlying data.
-
-### Access Requirements
-
-| Resource | Management | Retail | Publishing | IT |
-|---|---|---|---|---|
-| Management | Modify | Denied | Denied | Authorized administration |
-| Retail | Denied | Modify | Denied | Authorized administration |
-| Publishing | Denied | Denied | Modify | Authorized administration |
-| IT | Denied | Denied | Denied | Authorized access |
-| Public | Read | Read | Read | Authorized administration |
-
-The table defines the baseline access model.
-
-Any exception must be justified by a business requirement. For example, management may need access to certain business reports without receiving unrestricted access to all publishing content.
-
-### Permission Requirements
-
-- Configure SMB share permissions and NTFS permissions.
-- Use security groups for access control.
-- Apply least privilege.
-- Avoid broad permissions such as granting Everyone Full Control.
-- Verify permission inheritance.
-- Document the intended access for each share.
-- Test both permitted and denied operations.
-- Avoid storing real business or personal data in the lab.
-
-### Validation
-
-For each share:
-
-1. Connect using an authorized account.
-2. Create a test file where permitted.
-3. Read and modify files according to the intended permissions.
-4. Connect using an unauthorized account.
-5. Confirm that restricted access is denied.
-6. Review share and NTFS permissions if the result differs from expectations.
-7. Record the results.
+The combined role in this project is a hardware and cost constraint for the lab.
 
 ---
 
 ## 9. Group Policy and Workstation Security
 
-### Business Requirement
+Group Policy allows administrators to apply consistent configuration and security settings to domain users and computers.
 
-The company needs consistent security settings across Windows workstations without manually configuring each machine.
+The lab should demonstrate that policies are applied intentionally based on the OU structure.
 
-Group Policy will be used to apply common settings and demonstrate how workstation configurations can be centrally managed.
+### Common Workstation Baseline
 
-### Proposed GPOs
+Create a Group Policy Object for baseline workstation configuration.
 
-| GPO | Scope | Purpose |
-|---|---|---|
-| `GPO-Workstation-Baseline` | Workstation OUs | Apply common security settings |
-| `GPO-Retail-Workstations` | Retail workstation OU | Apply appropriate retail-specific settings |
-| `GPO-Publishing-Workstations` | Publishing workstation OU | Apply appropriate creative workstation settings |
-| `GPO-IT-Workstations` | IT workstation OU | Apply approved IT workstation settings |
+Possible settings include:
 
-Domain account password and lockout policies should be configured according to the intended domain policy design rather than duplicated indiscriminately across workstation GPOs.
+- Screen-lock and inactivity requirements.
+- Windows Defender and firewall settings.
+- Security options appropriate for the client operating system.
+- Restrictions on selected system settings.
+- Windows Update configuration where appropriate.
+- User experience settings that are useful for the lab.
 
-### Security Settings
+Use supported security settings and document why each setting is applied.
 
-Evaluate and configure suitable settings, including:
+Avoid adding policies solely for the sake of having more policies. Each setting should have a clear purpose and a way to verify its behavior.
 
-- Screen-lock timeout.
-- Interactive logon requirements.
-- Windows Firewall.
-- Appropriate Windows security options.
-- Restrictions on unnecessary local administrator access.
-- Relevant security auditing.
-- Other baseline settings appropriate for the Windows versions in the lab.
+### Department-Specific Policies
 
-Settings should be selected carefully to avoid blocking legitimate administrative tasks.
+Department-specific policies can be introduced when there is a genuine requirement.
 
-### Group Policy Requirements
+Examples:
 
-Demonstrate an understanding of:
+| Policy | Example Purpose |
+|---|---|
+| `GPO_Workstation_Baseline` | Common workstation security settings |
+| `GPO_Publishing_Workstations` | Additional settings for publishing workstations |
+| `GPO_IT_Workstations` | Appropriate administrative workstation configuration |
 
-- User Configuration versus Computer Configuration.
-- GPO linking and OU targeting.
-- Inheritance and precedence.
-- Security filtering.
-- Policy refresh.
-- Effective policy reporting.
-- Troubleshooting settings that fail to apply.
+These are proposed names. Use the names actually configured in the lab when documenting implementation.
 
-Useful commands include:
+Link computer configuration policies to the relevant computer OUs and user configuration policies to the relevant user OUs, unless a specific requirement calls for another design.
+
+### Password and Account Lockout Policies
+
+Password and account lockout policies should be configured with an understanding of their scope.
+
+For a basic domain password and lockout policy, configure the appropriate settings through domain-level Group Policy.
+
+Fine-Grained Password Policies can be used when different password or lockout requirements are needed for selected users or global security groups.
+
+Do not assume that linking an ordinary password policy to a department OU will override the domain's default password policy for its users.
+
+### Verify Group Policy
+
+On a domain-joined client, run:
 
 ```powershell
 gpupdate /force
+```
+
+To review the applied policies:
+
+```powershell
 gpresult /r
+```
+
+To generate an HTML report:
+
+```powershell
 gpresult /h C:\Temp\gpresult.html
 ```
+
+Ensure the destination directory exists before generating the report.
+
+If a policy does not apply, investigate:
+
+1. Whether the computer or user is in the intended OU.
+2. Whether the GPO is linked to the appropriate OU or domain.
+3. Whether security filtering permits the object to apply the policy.
+4. Whether inheritance, enforcement, or link order affects the result.
+5. Whether DNS and domain connectivity are working.
+6. Whether the policy applies to the relevant operating system and object type.
+7. Whether the Group Policy event logs report errors.
 
 ### Validation
 
 Demonstrate that:
 
-1. A domain-joined workstation receives the common baseline.
-2. A workstation in the Publishing OU receives the intended additional policy.
-3. A workstation outside the Publishing OU does not receive that OU-specific policy unless another link or policy scope applies.
-4. The administrator can identify the policies that are actually applied.
-5. A deliberately misconfigured policy can be diagnosed and corrected.
-
-Document the observed results rather than relying solely on the settings displayed in the Group Policy editor.
+- A client receives the intended workstation baseline.
+- The relevant settings are visible in the resulting policy report.
+- A policy linked to the wrong OU does not produce the expected result until placement or linkage is corrected.
+- Group Policy problems can be investigated and documented.
 
 ---
 
-## 10. Delegated Administration and Privileged Accounts
+## 10. Delegated Administration and Least Privilege
 
-### Business Requirement
+Not every IT employee should have Domain Admin privileges.
 
-The company has a small IT team and wants routine support tasks to be performed without granting every technician unrestricted control over the domain.
+A well-designed environment allows support staff to perform approved tasks without granting unrestricted control over the domain.
 
-The administrator must establish a clear separation between ordinary employee accounts, help desk accounts, and privileged administrative access.
+### Lab Scenario
 
-### Administrative Roles
+The `helpdesk1` account represents a support technician.
 
-#### Help Desk Account
+The technician should be able to perform selected tasks, such as resetting passwords or unlocking accounts, for designated users.
 
-The help desk account should be able to perform approved support tasks, such as:
+The technician should not automatically be able to:
 
-- Resetting passwords for designated users.
-- Unlocking accounts.
-- Viewing relevant user attributes.
-- Performing routine account-management tasks within the assigned OU.
+- Modify domain-wide security settings.
+- Manage privileged administrative accounts.
+- Change arbitrary security group memberships.
+- Modify domain controller security settings.
+- Grant themselves Domain Admin membership.
 
-The account should not automatically receive Domain Admin privileges.
+### Delegation Approach
 
-#### Systems Administrator Account
+Use Active Directory's delegation capabilities to grant narrowly scoped permissions to the relevant OU or objects.
 
-The privileged systems administrator account should be used for tasks such as:
+For example, delegate password-reset and account-unlock permissions on a designated user OU to an appropriate support group.
 
-- Managing Active Directory.
-- Configuring DNS.
-- Managing Group Policy.
-- Administering domain-joined servers.
-- Troubleshooting infrastructure.
-- Performing approved security and recovery operations.
+Do not grant Domain Admin membership merely to make support tasks work.
 
-### Requirements
+### Testing
 
-- Create an appropriate help desk security group.
-- Delegate only the necessary permissions.
-- Restrict delegation to the intended OU where possible.
-- Use separate accounts for privileged operations.
-- Avoid using privileged accounts for routine employee activities.
-- Document the intended permissions.
-- Validate the delegation using a test account.
+Perform both positive and negative tests.
 
-### Validation
+| Test | Expected Result |
+|---|---|
+| Helpdesk resets an authorized user's password | Allowed |
+| Helpdesk unlocks an authorized user's account | Allowed if configured |
+| Helpdesk modifies an object outside the delegated scope | Denied |
+| Helpdesk attempts to change protected domain-wide settings | Denied |
+| Privileged administrative account performs an authorized domain task | Allowed |
 
-Using the help desk account:
+The exact result depends on the permissions delegated and the security protections in place.
 
-1. Reset a test user's password.
-2. Unlock a test account.
-3. Attempt an administrative action outside the delegated scope.
-4. Verify that the permitted actions succeed.
-5. Verify that unauthorized actions are denied.
+### Documentation
 
-Document the results and explain how the delegation limits administrative exposure.
+Record:
+
+- Which account or group received delegated permissions.
+- Which OU or objects are within scope.
+- Which administrative tasks are permitted.
+- Which actions are intentionally denied.
+- How each behavior was tested.
+
+This demonstrates an understanding of least privilege rather than simply assigning broad administrative roles.
 
 ---
 
-## 11. DNS and Domain Troubleshooting
+## 11. DNS and Infrastructure Troubleshooting
 
-### Business Requirement
+Troubleshooting is an important part of systems administration.
 
-Employees depend on reliable domain authentication, workstation connectivity, and access to internal resources.
+A useful lab should demonstrate not only that services work, but also that common failures can be identified, investigated, and resolved.
 
-The administrator must be able to diagnose common infrastructure problems without relying on trial and error.
+### Scenario 1: Domain Authentication Failure
 
-### Required Troubleshooting Scenarios
-
-#### Scenario A: Domain Login Failure
-
-A user cannot authenticate to a domain-joined workstation.
+**Symptom:** A user cannot sign in to the domain.
 
 Investigate:
 
-- Account status.
-- Credential correctness.
-- Network connectivity.
-- Client DNS configuration.
-- Domain controller discovery.
-- Time synchronization.
-- Relevant Windows event logs.
+1. Whether the account exists and is enabled.
+2. Whether the password is correct.
+3. Whether the account is locked or expired.
+4. Whether the client has network connectivity.
+5. Whether the client can resolve the domain controller.
+6. Whether the system time is sufficiently synchronized for domain authentication.
+7. Whether relevant authentication or directory-service events provide additional information.
 
-Document the root cause and validate the fix.
+Useful commands:
 
-#### Scenario B: DNS Failure
+```powershell
+whoami
+ipconfig /all
+nltest /dsgetdc:ad.comics.internal
+```
 
-A workstation cannot locate a domain controller or resolve an internal server name.
+`nltest` is available on supported Windows systems, including many Windows client and server installations.
 
-Investigate:
+### Scenario 2: DNS Failure
 
-- DNS client configuration.
-- DNS server availability.
-- Name resolution using `nslookup`.
-- Active Directory service records.
-- Network connectivity.
-- DNS forwarding where external resolution is involved.
-
-Do not simply replace internal DNS with a public resolver.
-
-#### Scenario C: File Share Access Failure
-
-A user receives an access-denied error when accessing a shared folder.
+**Symptom:** A client cannot locate the domain controller or resolve the internal domain.
 
 Investigate:
 
-- User group membership.
-- Share permissions.
-- NTFS permissions.
-- Permission inheritance.
-- Network connectivity.
-- Existing SMB sessions.
-- Whether a recent group membership change requires a fresh logon.
+- The DNS servers configured on the client.
+- Whether the internal DNS service is running.
+- Whether the domain controller's DNS records exist.
+- Whether the client can reach the DNS server.
+- Whether DNS forwarding is required for external name resolution.
 
-#### Scenario D: Group Policy Failure
+Useful commands:
 
-A workstation does not receive an expected configuration.
+```powershell
+ipconfig /all
+nslookup DC01.ad.comics.internal
+nslookup -type=SRV _ldap._tcp.dc._msdcs.ad.comics.internal
+```
+
+The SRV record query helps verify that the client can locate Active Directory services through DNS.
+
+### Scenario 3: File Access Failure
+
+**Symptom:** A user can sign in but cannot open a departmental share.
+
+Investigate:
+
+1. Whether the user can reach the server.
+2. Whether the share name is correct.
+3. Whether the user's group memberships are correct.
+4. Whether SMB share permissions permit access.
+5. Whether NTFS permissions permit access.
+6. Whether inherited permissions or explicit deny entries affect access.
+7. Whether the user's logon session reflects recent group membership changes.
+
+Useful commands:
+
+```powershell
+whoami /groups
+Test-NetConnection DC01 -Port 445
+```
+
+A group membership change may require a new logon session before the user's access token reflects the change.
+
+### Scenario 4: Group Policy Failure
+
+**Symptom:** A workstation does not receive an expected setting.
 
 Investigate:
 
 - OU placement.
-- GPO links.
-- User versus computer settings.
+- GPO linkage.
 - Security filtering.
-- Policy precedence.
-- Domain connectivity.
+- Policy scope.
+- DNS and domain connectivity.
 - Group Policy operational logs.
 
-Use:
+Useful commands:
 
 ```powershell
 gpupdate /force
-gpresult /h C:\Temp\gpresult.html
+gpresult /r
 ```
 
-#### Scenario E: Account Lockout
+### Scenario 5: Account Lockout
 
-A user's account repeatedly becomes locked.
+**Symptom:** A user cannot authenticate because the account is locked.
 
 Investigate:
 
-- Account lockout status.
-- Relevant security events.
-- Stale credentials.
-- Saved credentials or mapped drives.
-- Scheduled tasks or services using the account, where applicable.
-- Whether the lockout policy is configured as intended.
+- Whether the account is locked.
+- The account lockout policy.
+- Relevant domain controller security events.
+- Whether a device or application is repeatedly using an old password.
+- Whether saved credentials or scheduled tasks could be contributing to the problem.
 
-### Troubleshooting Documentation
+Unlock the account only after following the lab's intended support procedure.
 
-For each scenario, record:
+### Troubleshooting Record Template
 
-1. Reported problem.
-2. Expected behavior.
-3. Initial observations.
-4. Diagnostic commands.
-5. Evidence collected.
-6. Root cause.
-7. Corrective action.
-8. Verification results.
-9. Preventive recommendations.
+For each scenario, document:
 
-The objective is to demonstrate a repeatable troubleshooting process.
+| Field | Description |
+|---|---|
+| Symptom | What the user or administrator observed |
+| Expected Behavior | What should have happened |
+| Diagnostic Steps | Commands, logs, and settings examined |
+| Root Cause | The underlying reason for the failure |
+| Resolution | The corrective action |
+| Verification | Evidence that the issue was resolved |
+
+A good troubleshooting record explains how the root cause was identified, not just which setting was changed.
 
 ---
 
 ## 12. PowerShell Administration and Automation
 
-### Business Requirement
+PowerShell can reduce repetitive administrative work and make routine operations more consistent.
 
-A single systems administrator cannot afford to perform every routine administrative task manually.
+This lab should include a small collection of scripts with clear purposes, input validation, error handling, and documentation.
 
-The company needs simple, repeatable scripts that reduce errors and improve the consistency of account administration.
+### Script 1: Bulk User Creation
 
-### Required Automation
+**File:** `scripts/New-LabUsers.ps1`
 
-Implement at least two useful PowerShell scripts, with additional scripts added as time permits.
+Purpose:
 
-#### Script 1: Bulk User Provisioning
+- Read user information from a CSV file.
+- Validate required fields.
+- Check whether accounts already exist.
+- Create user accounts in the intended OU.
+- Assign approved group memberships.
+- Report successes and failures.
 
-Create a script that reads employee information from a CSV file.
-
-Example:
+Example CSV structure:
 
 ```csv
-FirstName,LastName,Username,Department,Title
-Taylor,Reed,treed,Retail,Sales Associate
-Casey,Parker,cparker,Publishing,Illustrator
-Jordan,Blake,jblake,Retail,Inventory Associate
+Username,FirstName,LastName,Department
+retail1,Peter,Parker,Retail
+retail2,Mary,Jane,Retail
+creative1,Kamala,Khan,Publishing
+creative2,Matt,Murdock,Publishing
 ```
 
-The script should:
+The script should map each department to the correct OU and group configuration.
 
-- Validate required fields.
-- Check for existing usernames.
-- Verify the target OU.
-- Create approved accounts.
-- Populate relevant directory attributes.
-- Assign appropriate group memberships.
-- Log successes and failures.
-- Report invalid or duplicate records.
+It should not blindly create accounts if the input is malformed or an account already exists.
 
-The script must not silently skip errors or create accounts using predictable passwords embedded in the source code.
+**Security considerations:**
 
-Use synthetic input data and a controlled initial credential process.
+- Do not commit real employee data to a public repository.
+- Do not hardcode plaintext passwords.
+- Do not log temporary passwords.
+- Use a secure process for initial passwords.
+- Make the script safe to rerun where practical.
+- Validate target OUs and group names before making changes.
 
-#### Script 2: User Account Audit
+### Script 2: User Account Audit
 
-Generate a report containing:
+**File:** `scripts/Get-LabUserAudit.ps1`
+
+Purpose:
+
+- Enumerate users in selected OUs.
+- Report account status.
+- Identify disabled accounts.
+- Report useful account attributes.
+- Export results to CSV.
+
+Potential report fields:
 
 - Username.
 - Display name.
 - Department.
-- Account status.
-- Organizational Unit.
-- Selected security group memberships.
+- Enabled status.
+- Account expiration status.
+- Last logon information, with its limitations clearly documented.
 
-Use the report to identify accounts that are disabled, misplaced, or inconsistent with the intended directory design.
+Active Directory's `LastLogonDate` is a replicated approximation derived from the `lastLogonTimestamp` attribute. It should not be treated as an exact, real-time last-logon record.
 
-#### Script 3: Security Group Audit
+### Script 3: Group Membership Audit
 
-Export the membership of selected departmental and resource permission groups.
+**File:** `scripts/Export-LabGroupMembers.ps1`
 
-The report should help the administrator verify that users receive only the access intended for their roles.
+Purpose:
 
-### Automation Standards
+- Enumerate selected security groups.
+- Export their members.
+- Help administrators review access assignments.
+- Identify unexpected memberships.
 
-Scripts must:
+The report should distinguish between direct membership and nested membership where relevant.
 
-- Use clear naming conventions.
-- Include comments where useful.
-- Validate input before making changes.
-- Handle errors.
-- Generate meaningful output.
-- Require appropriate privileges.
-- Avoid storing credentials in source files.
-- Be tested against disposable lab accounts.
-- Include execution instructions in the repository.
+### Example: Find a User
 
-### Validation
+```powershell
+Get-ADUser -Identity retail1 -Properties Department,Enabled
+```
 
-Demonstrate that a script can process valid input, identify invalid data, detect duplicate accounts, and report errors.
+### Example: List Enabled Users
 
-Document the expected output and provide a sanitized example report.
+```powershell
+Get-ADUser -Filter 'Enabled -eq $true' -Properties Department |
+    Select-Object SamAccountName, Name, Department, Enabled
+```
+
+### Example: View Group Members
+
+```powershell
+Get-ADGroupMember -Identity GG_Publishing
+```
+
+These commands require the Active Directory PowerShell module and appropriate permissions.
+
+### Script Quality Expectations
+
+Each script should include:
+
+- A comment-based description.
+- Documented parameters.
+- Input validation.
+- Appropriate error handling.
+- Clear output.
+- A least-privilege execution model.
+- A sample input file where applicable.
+- Instructions for testing safely in the lab.
 
 ---
 
 ## 13. Security Auditing and Event Logs
 
-### Business Requirement
+A systems administrator should be able to investigate important account and security changes.
 
-The company needs sufficient visibility into administrative changes and account activity to investigate problems and review important security events.
+Windows security auditing can record selected events on domain controllers and clients, depending on the audit configuration.
 
-### Audit Requirements
+### Events to Investigate
 
-Configure appropriate auditing for selected events, including:
+| Activity | What to Investigate |
+|---|---|
+| User account creation | Which account was created and when |
+| Account enablement or disablement | Who performed the action |
+| Security group membership changes | Which membership changed |
+| Failed logon attempts | Whether authentication is failing repeatedly |
+| Account lockouts | Which account was locked and available supporting details |
+| Group Policy changes | Whether policy configuration changed |
+| File access | Whether relevant file-system auditing is configured and generating events |
 
-- User account creation.
-- User account disablement.
-- Security group membership changes.
-- Privileged group membership changes.
-- Relevant logon failures.
-- Account lockouts.
-- Group Policy modifications where appropriate.
+### Configuration
 
-### Validation
+1. Configure the relevant audit policies.
+2. Apply the policies to the appropriate domain controllers or clients.
+3. Perform controlled test actions.
+4. Open Event Viewer.
+5. Review the Security log and relevant operational logs.
+6. Record the event IDs, timestamps, and details that support the investigation.
 
-Perform selected administrative actions and inspect the relevant Windows event logs.
+### Important Considerations
 
-For example:
+An event will not necessarily appear simply because an activity occurred.
 
-1. Create a test account.
-2. Add the account to a security group.
-3. Disable the account.
-4. Review the relevant event logs.
-5. Identify the event details available for investigation.
-6. Document the result.
+The appropriate audit category or subcategory must be configured, the action must be covered by that audit setting, and the system must retain the resulting event.
 
-Audit settings must be configured where required; do not assume every event is logged by default.
+For example, auditing file access requires appropriate audit policy and filesystem auditing configuration. Ordinary file access should not be assumed to generate a useful Security log event automatically.
 
-### Deliverables
+### Evidence
 
-Document:
+Include sanitized screenshots or exported examples demonstrating selected events, such as:
 
-- The selected audit settings.
-- The systems where relevant events are recorded.
-- How to locate the events.
-- The information they provide.
-- How an administrator could use the information to investigate a problem.
+- A user account being created.
+- A group membership change.
+- A failed logon.
+- An account lockout, if configured and tested.
 
-A centralized logging platform is a potential future enhancement, not a requirement for the initial project.
+Do not publish sensitive account information, real credentials, or unnecessary security details.
 
 ---
 
 ## 14. Backup and Recovery
 
-### Business Requirement
+A reliable IT environment must be recoverable when configuration changes, data loss, or system failures occur.
 
-The company relies on its shared files for daily operations.
+The lab should demonstrate an understanding of both file recovery and Active Directory recovery.
 
-The administrator must have a documented process for recovering important files and protecting the domain infrastructure against accidental changes or failures.
+### File Recovery
 
-### Requirements
+Test a basic file-recovery procedure:
 
-Develop a basic recovery strategy covering:
+1. Create a test document in a departmental share.
+2. Back up the document using the selected backup method.
+3. Modify or delete the document.
+4. Restore the document.
+5. Verify its contents and permissions.
+6. Document the recovery steps and result.
 
-- File server data.
-- Active Directory System State.
-- Important configuration documentation.
-- Recovery of accidentally deleted or modified test objects.
-- Verification that backups are usable.
+The backup method may depend on the tools and storage available in the local environment.
 
-### Practical Exercises
+### Active Directory Recovery
 
-1. Back up a test directory containing sample company files.
-2. Restore a deleted test file.
-3. Verify that the restored file contains the expected data.
-4. Document the backup destination and procedure.
-5. Investigate supported options for recovering a deleted Active Directory object.
-6. Document the difference between file recovery and Active Directory recovery.
+Active Directory recovery is different from ordinary file recovery.
 
-Use a supported backup method appropriate for the installed Windows Server version.
+A domain controller backup should account for the directory service and its supporting system state.
 
-A virtual machine snapshot can be useful as a lab checkpoint but should not be treated as a complete production backup strategy.
+Research and document:
 
-### Validation
+- What System State backup protects.
+- How a domain controller backup differs from a file backup.
+- The purpose of Directory Services Restore Mode (DSRM).
+- The difference between restoring a deleted object and recovering a domain controller.
+- Why domain controller recovery procedures must account for replication and directory consistency.
 
-Complete at least one successful recovery exercise.
+Do not experiment with destructive domain controller recovery procedures on the only copy of your lab without a verified recovery path.
 
-Record:
+### Recovery Documentation
 
-- What was backed up.
-- What was deleted or changed.
-- Which recovery procedure was used.
-- How the restored data was verified.
-- What limitations remain in the lab's recovery strategy.
+Document:
+
+- What data or configuration is protected.
+- Where backups are stored.
+- How often backups are taken.
+- How recovery is initiated.
+- What permissions or tools are required.
+- How restoration is verified.
+- Any limitations of the lab's backup design.
+
+### Important Note
+
+A virtual machine snapshot can be useful during lab experimentation, but it is not a substitute for a properly designed and tested backup strategy.
 
 ---
 
 ## 15. Operational Documentation
 
-### Business Requirement
+Good administrators document recurring tasks so that another technician can perform them consistently.
 
-The company needs documented IT procedures so that routine tasks can be performed consistently and future support personnel can understand the environment.
+Create concise runbooks for the following tasks.
 
-### Required Runbooks
+### User Administration
 
-Create concise, repeatable procedures for:
+- Creating a user account.
+- Changing a user's department.
+- Disabling an account.
+- Resetting a password.
+- Unlocking an account.
+- Reviewing group memberships.
 
-| Runbook | Purpose |
-|---|---|
-| User onboarding | Create accounts and assign access |
-| User offboarding | Disable accounts and review access |
-| Password reset | Reset credentials and verify account status |
-| Account lockout | Diagnose and resolve lockouts |
-| Domain joining | Join a workstation to the domain |
-| File share provisioning | Create shares and configure permissions |
-| Group Policy troubleshooting | Diagnose policy-processing issues |
-| DNS troubleshooting | Investigate internal name-resolution failures |
-| Backup recovery | Restore and verify selected data |
+### Computer Administration
 
-Each runbook should include:
+- Joining a computer to the domain.
+- Moving a computer object to the correct OU.
+- Verifying DNS configuration.
+- Confirming domain connectivity.
+- Checking applied Group Policy.
 
-- Purpose.
-- Prerequisites.
-- Required permissions.
-- Procedure.
-- Verification steps.
-- Common failure scenarios.
+### File Services
 
-Use screenshots and sanitized command output where they help explain the process.
+- Creating a departmental folder.
+- Creating an SMB share.
+- Configuring share permissions.
+- Configuring NTFS permissions.
+- Testing access with an authorized user.
+- Troubleshooting denied access.
 
-Never publish passwords, recovery secrets, private keys, or sensitive configuration information.
+### Troubleshooting
+
+- Diagnosing domain authentication failure.
+- Diagnosing DNS failure.
+- Investigating account lockouts.
+- Diagnosing Group Policy issues.
+- Investigating file-access problems.
+
+### Recovery
+
+- Restoring a deleted test file.
+- Verifying a backup.
+- Documenting the relevant Active Directory recovery procedures.
+
+Each runbook should contain the purpose, prerequisites, procedure, verification steps, and relevant troubleshooting notes.
 
 ---
 
 ## 16. Implementation Plan
 
-The project will be implemented in stages to keep the environment manageable.
+The lab can be implemented incrementally.
 
-### Phase 1: Infrastructure Validation
+### Phase 1: Verify the Existing Domain
 
-- Document the existing domain configuration.
-- Verify Active Directory and DNS.
-- Document the server IP configuration.
-- Confirm that a Windows client can locate a domain controller.
-- Establish the initial infrastructure diagram.
+- Confirm the domain name.
+- Verify the domain controller's hostname.
+- Confirm that AD DS and DNS are operational.
+- Verify that clients can resolve and locate the domain controller.
+- Document the existing OU structure.
 
-**Deliverables:** Infrastructure overview, domain configuration notes, and connectivity test results.
+**Deliverable:** Verified domain environment and architecture documentation.
 
-### Phase 2: Directory Design
+### Phase 2: Complete the OU and User Structure
 
-- Create the proposed OU structure.
-- Establish user and computer naming conventions.
-- Create representative employee accounts.
-- Create departmental security groups.
-- Document account lifecycle procedures.
+- Verify the `Computers` OU.
+- Verify the `Workstations` and `Servers` child OUs.
+- Verify the location OUs under each.
+- Verify the `Users` and department OU structure.
+- Create the representative employee accounts.
+- Place users and computer objects in the intended locations.
 
-**Deliverables:** OU hierarchy, user and group inventory, and account management documentation.
+**Deliverable:** Documented OU hierarchy and representative user accounts.
 
-### Phase 3: File Services
+### Phase 3: Implement Security Groups
 
-- Configure the domain-joined file server.
-- Create departmental shares.
-- Configure share and NTFS permissions.
-- Implement group-based access control.
-- Test authorized and unauthorized access.
+- Create the departmental Global groups.
+- Create the Domain Local resource groups.
+- Add users to the appropriate Global groups.
+- Nest the Global groups into the corresponding resource groups.
+- Verify group memberships.
 
-**Deliverables:** File server documentation, access matrix, and permission test results.
+**Deliverable:** Documented group design and membership tests.
 
-### Phase 4: Group Policy
+### Phase 4: Configure File Services
 
-- Implement the workstation security baseline.
-- Configure appropriate password and account lockout policies.
-- Create department-specific policies where needed.
-- Validate policy targeting and inheritance.
-- Document the effective policy results.
+- Create the departmental folder structure.
+- Configure SMB shares.
+- Apply share permissions.
+- Apply NTFS permissions.
+- Test authorized and unauthorized access from both clients.
 
-**Deliverables:** GPO inventory, configuration notes, and policy test evidence.
+**Deliverable:** Working departmental file shares with documented access controls.
 
-### Phase 5: Delegated Administration
+### Phase 5: Configure Group Policy
 
-- Create the help desk security group.
-- Delegate appropriate permissions.
-- Establish separate privileged accounts where appropriate.
-- Test permitted and prohibited operations.
+- Create a workstation baseline policy.
+- Apply the policy to the appropriate workstation OU.
+- Configure relevant account policies at the correct scope.
+- Test policy application on the clients.
+- Investigate and document at least one controlled policy issue.
 
-**Deliverables:** Delegation documentation and validation results.
+**Deliverable:** Verified Group Policy configuration and troubleshooting evidence.
 
-### Phase 6: Automation and Troubleshooting
+### Phase 6: Configure Delegated Administration
 
-- Develop the user provisioning script.
-- Create an account or group auditing script.
-- Complete the required troubleshooting scenarios.
-- Document diagnostic commands and fixes.
+- Create or designate the support group.
+- Delegate only the required user-management tasks.
+- Test allowed actions.
+- Test actions that should be denied.
+- Document the scope of delegation.
 
-**Deliverables:** PowerShell scripts, sample CSV data, and troubleshooting runbooks.
+**Deliverable:** Demonstrated least-privilege administration.
 
-### Phase 7: Auditing and Recovery
+### Phase 7: Automate and Troubleshoot
+
+- Implement the user provisioning script.
+- Implement the user audit script.
+- Implement the group membership export script.
+- Document DNS, authentication, Group Policy, and file-access troubleshooting.
+- Validate scripts using lab accounts.
+
+**Deliverable:** Tested scripts and troubleshooting runbooks.
+
+### Phase 8: Audit, Back Up, and Document
 
 - Configure selected audit policies.
-- Validate important administrative events.
-- Document the backup strategy.
-- Complete a recovery exercise.
+- Capture relevant security events.
+- Back up a test file and verify restoration.
+- Document Active Directory recovery concepts.
+- Review the README and repository for accuracy.
+- Remove sensitive information from all committed files.
 
-**Deliverables:** Audit documentation, event investigation, and recovery test results.
-
-### Phase 8: Final Validation
-
-- Review each project requirement.
-- Correct configuration issues.
-- Capture sanitized evidence.
-- Verify that the documentation matches the implemented environment.
-- Prepare the repository for public review.
-
-**Deliverables:** Final README, infrastructure diagrams, scripts, runbooks, and requirements validation matrix.
+**Deliverable:** A documented, reproducible, and demonstrable Active Directory lab.
 
 ---
 
 ## 17. Acceptance Criteria
 
-The project is complete when the implemented functionality has been tested and documented.
+The lab is considered complete when the following behaviors have been demonstrated and documented.
 
 | ID | Requirement | Evidence |
 |---|---|---|
-| AC-01 | Active Directory is operational | Successful domain authentication |
-| AC-02 | DNS supports domain discovery | DNS queries and domain controller discovery |
-| AC-03 | Directory objects follow the documented structure | OU and object inventory |
-| AC-04 | User lifecycle procedures work | Account provisioning and disablement tests |
-| AC-05 | Security groups control resource access | Group membership and access tests |
-| AC-06 | File shares enforce departmental restrictions | Successful and denied access tests |
-| AC-07 | Group Policy applies intended settings | Effective policy reports |
-| AC-08 | Delegated administration follows least privilege | Permitted and prohibited action tests |
-| AC-09 | Common infrastructure failures can be diagnosed | Completed troubleshooting records |
-| AC-10 | PowerShell automation is repeatable | Tested scripts and sample output |
-| AC-11 | Important administrative events can be investigated | Event log evidence |
-| AC-12 | Recovery procedures work | Successful restoration exercise |
-| AC-13 | Administrative tasks are documented | Completed runbooks |
-| AC-14 | The project is understandable to another administrator | README, diagrams, and supporting documentation |
+| AC-01 | Domain controller and DNS are operational | DNS and domain discovery tests |
+| AC-02 | Client machines are joined to the domain | Domain membership evidence |
+| AC-03 | OU hierarchy matches the documented design | Active Directory OU screenshots or exported structure |
+| AC-04 | Computer objects are placed under the correct workstation or server location OU | Computer object placement evidence |
+| AC-05 | Representative employee accounts exist in the correct OUs | User object and OU evidence |
+| AC-06 | Security groups represent departmental responsibilities | Group membership evidence |
+| AC-07 | Departmental file shares are configured | Share configuration evidence |
+| AC-08 | Authorized employees can access their required resources | Successful access tests |
+| AC-09 | Unauthorized employees are denied restricted access | Failed access tests |
+| AC-10 | Workstations receive the intended Group Policy settings | `gpresult` report or equivalent evidence |
+| AC-11 | Delegated support tasks work within their intended scope | Positive and negative delegation tests |
+| AC-12 | PowerShell scripts produce the expected results | Script output and sample reports |
+| AC-13 | Selected security events can be investigated | Sanitized Event Viewer evidence |
+| AC-14 | A test file can be restored from backup | Documented restoration test |
 
-A requirement must not be marked complete until its behavior has been verified.
+Do not mark an acceptance criterion as complete until the behavior has been tested.
+
+Screenshots and command output should be sanitized to avoid exposing credentials, personal information, or unnecessary infrastructure details.
 
 ---
 
-## 18. GitHub Repository Structure
+## 18. Repository Structure
 
-Organize the repository so that hiring managers can quickly understand the environment and technical reviewers can explore the implementation.
+The GitHub repository should make the project easy for another administrator or hiring manager to explore.
 
 ```text
 active-directory-small-business-lab/
-│
-├── README.md
-│
-├── docs/
-│   ├── architecture.md
-│   ├── active-directory-design.md
-│   ├── network-design.md
-│   ├── group-policy.md
-│   ├── file-server-permissions.md
-│   ├── delegated-administration.md
-│   ├── backup-and-recovery.md
-│   │
-│   ├── runbooks/
-│   │   ├── user-onboarding.md
-│   │   ├── user-offboarding.md
-│   │   ├── password-reset.md
-│   │   ├── domain-join.md
-│   │   ├── file-share-access.md
-│   │   └── troubleshooting.md
-│   │
-│   └── troubleshooting/
-│       ├── dns-failure.md
-│       ├── authentication-failure.md
-│       ├── group-policy-failure.md
-│       └── file-share-access-denied.md
-│
-├── scripts/
-│   ├── New-LabUsers.ps1
-│   ├── Get-LabUserAudit.ps1
-│   └── Export-LabGroupMembers.ps1
-│
-├── samples/
-│   └── users.example.csv
-│
-├── diagrams/
-│   ├── infrastructure.mmd
-│   └── active-directory-structure.mmd
-│
-├── evidence/
-│   ├── domain-connectivity/
-│   ├── group-policy/
-│   ├── file-permissions/
-│   ├── delegation/
-│   └── recovery/
-│
-└── .gitignore
+|
++-- README.md
+|
++-- docs/
+|   |
+|   +-- architecture.md
+|   +-- active-directory-design.md
+|   +-- network-design.md
+|   +-- group-policy.md
+|   +-- file-server-permissions.md
+|   +-- delegated-administration.md
+|   +-- backup-and-recovery.md
+|   |
+|   +-- runbooks/
+|   |   +-- user-onboarding.md
+|   |   +-- user-offboarding.md
+|   |   +-- password-reset.md
+|   |   +-- domain-join.md
+|   |   +-- file-share-access.md
+|   |
+|   +-- troubleshooting/
+|       +-- dns.md
+|       +-- authentication.md
+|       +-- group-policy.md
+|       +-- file-access.md
+|
++-- scripts/
+|   +-- New-LabUsers.ps1
+|   +-- Get-LabUserAudit.ps1
+|   +-- Export-LabGroupMembers.ps1
+|
++-- samples/
+|   +-- users.example.csv
+|
++-- diagrams/
+|   +-- infrastructure.mmd
+|   +-- active-directory-structure.mmd
+|
++-- evidence/
+|   +-- domain-connectivity/
+|   +-- group-policy/
+|   +-- file-permissions/
+|   +-- delegation/
+|   +-- recovery/
+|
++-- .gitignore
 ```
 
-Only include files that have been created or clearly document planned work.
+This is a proposed structure. Add files as the corresponding features are implemented rather than creating empty documentation for work that has not yet been completed.
 
-Evidence should demonstrate actual configuration and validation without exposing credentials, private keys, or sensitive network details.
+### Documentation Standards
+
+- Use Markdown for documentation.
+- Use Mermaid for diagrams that should be version-controlled as text.
+- Include commands and expected results where useful.
+- Keep sample data fictional.
+- Clearly label proposed configurations versus implemented configurations.
+- Document the environment's limitations.
+- Include evidence for completed acceptance criteria.
+
+### GitHub Security
+
+Before committing files:
+
+- Remove passwords, secrets, tokens, and private keys.
+- Avoid committing real user information.
+- Review exported configuration and logs for sensitive information.
+- Use `.gitignore` for temporary files, private configuration, and local artifacts.
+- Never rely on a private repository as a substitute for removing secrets.
 
 ---
 
 ## 19. Future Enhancements
 
-After completing the initial environment, consider expanding the lab with additional infrastructure and administration challenges.
+The following enhancements can expand the lab once the core requirements are complete.
 
-### Active Directory Resilience
+### Dedicated Administrative Workstation
 
-- Deploy a second domain controller.
-- Configure and validate replication.
-- Investigate DNS replication.
-- Simulate the unavailability of a domain controller.
+Add an `ADMIN01` workstation and install the appropriate Remote Server Administration Tools (RSAT).
 
-### Windows Server Administration
+Use it to demonstrate remote management of Active Directory and other supported Windows Server roles.
 
-- Explore server update management.
-- Implement more comprehensive backup procedures.
-- Monitor resource utilization and service availability.
-- Document server maintenance procedures.
+This would also provide an opportunity to explore privileged account separation and administrative workstation security.
 
-### Security Improvements
+### Secondary Domain Controller
 
-- Explore Windows LAPS for local administrator password management.
-- Review privileged group membership.
-- Improve Windows security auditing.
-- Evaluate workstation security baselines.
-- Explore managed service accounts where appropriate.
+Add a second domain controller to explore:
 
-### Automation
+- Active Directory replication.
+- DNS integration.
+- Replication troubleshooting.
+- Domain controller availability.
+- Backup and recovery planning.
 
-- Expand PowerShell provisioning.
-- Automate account and group audits.
-- Generate infrastructure inventory reports.
-- Create repeatable configuration and validation procedures.
+A second domain controller should be configured and tested rather than merely added to the architecture diagram.
 
-### Monitoring
+### Dedicated File Server
 
-- Centralize selected Windows event logs.
-- Implement infrastructure health checks.
-- Create a basic monitoring dashboard.
-- Document incident investigation procedures.
+Move file services from the domain controller to a separate member server.
 
-Each enhancement should be added only after the foundational environment is working and documented.
+This would demonstrate:
+
+- Member server domain joining.
+- SMB administration.
+- File-server security.
+- Independent server maintenance.
+- Separation of infrastructure roles.
+
+### Additional Security Improvements
+
+Potential extensions include:
+
+- Windows LAPS for local administrator password management.
+- More detailed audit policies.
+- Centralized event collection.
+- Infrastructure monitoring.
+- Additional PowerShell reporting.
+- More advanced delegation scenarios.
+- Fine-Grained Password Policies.
+- Backup verification and recovery exercises.
+
+Each enhancement should solve a specific operational problem and include a way to verify that it works.
 
 ---
 
 ## 20. Project Outcome
 
-This project demonstrates the design and administration of a small-business Windows infrastructure environment built around Active Directory Domain Services.
+This project demonstrates how a small organization can use Windows Server and Active Directory to centralize identity management, organize computer and user objects, enforce access controls, and administer Windows workstations.
 
-The environment addresses practical business requirements involving centralized identity management, departmental file storage, access control, workstation security, delegated administration, PowerShell automation, troubleshooting, auditing, and recovery planning.
+The lab emphasizes practical administration rather than configuration alone.
 
-The lab emphasizes the relationship between infrastructure configuration and operational outcomes.
+By completing the documented tests, scripts, and runbooks, the project provides evidence of the ability to:
 
-By completing the project, the administrator demonstrates the ability to configure and maintain core Windows infrastructure, investigate common technical failures, enforce appropriate access controls, automate repetitive tasks, and document procedures that can be followed by other IT personnel.
+- Manage Active Directory users, groups, and OUs.
+- Troubleshoot domain connectivity and DNS.
+- Configure Group Policy and verify its application.
+- Implement departmental file access using security groups and permissions.
+- Delegate routine support tasks according to least privilege.
+- Automate administrative operations with PowerShell.
+- Investigate security events.
+- Document and test recovery procedures.
 
-**The objective is to demonstrate the practical skills required to support a small organization's Windows environment as its systems administrator, not simply to demonstrate that Active Directory has been installed.**
+The environment is intentionally small and locally hosted. It is designed to demonstrate foundational Windows infrastructure skills while providing a clear path toward more advanced enterprise administration.
+
+**The goal is not simply to have a functioning domain
