@@ -1,6 +1,6 @@
-# Stark Panels & Publishing — Active Directory Lab
+# Flux Comics — Active Directory Lab
 
-A hands-on Windows Server and Active Directory lab demonstrating practical IT infrastructure, systems administration, identity management, access control, Group Policy, file services, troubleshooting, and automation skills.
+A hands-on Windows Server and Active Directory lab demonstrating practical IT infrastructure, systems administration, identity management, access control, Group Policy, file services, troubleshooting, and automation.
 
 ---
 
@@ -46,9 +46,9 @@ Rather than configuring Active Directory in isolation, this lab focuses on commo
 
 ## 2. Business Scenario
 
-### Company: Stark Panels & Publishing
+### Company: Flux Comics
 
-Stark Panels & Publishing is a fictional comic book publishing and retail company with approximately 20 employees.
+Flux Comics is a fictional comic book publishing and retail company with approximately 20 employees.
 
 The company has several departments that need access to different files, applications, and administrative resources.
 
@@ -93,6 +93,7 @@ This lab is designed to run locally on a laptop using the available virtual mach
 
 | Component | Configuration |
 |---|---|
+| Company | Flux Comics |
 | Domain | `ad.comics.internal` |
 | Primary server | `DC01` — logical hostname used in this documentation |
 | Server roles | AD DS, DNS, and file services |
@@ -136,27 +137,27 @@ A production environment would also require appropriate backup, recovery, availa
 ### Logical Architecture
 
 ```text
-                    Stark Panels & Publishing
-                               |
-                               |
-                    ad.comics.internal
-                               |
-                       +---------------+
-                       |     DC01      |
-                       |---------------|
-                       | AD DS         |
-                       | DNS           |
-                       | File Services |
-                       +---------------+
-                               |
-                  +------------+------------+
-                  |                         |
-           +-------------+           +-------------+
-           |  CLIENT01   |           |  CLIENT02   |
-           |-------------|           |-------------|
-           | Windows     |           | Windows     |
-           | Workstation |           | Workstation |
-           +-------------+           +-------------+
+                       Flux Comics
+                            |
+                            |
+                   ad.comics.internal
+                            |
+                      +---------------+
+                      |     DC01      |
+                      |---------------|
+                      | AD DS         |
+                      | DNS           |
+                      | File Services |
+                      +---------------+
+                            |
+                 +----------+----------+
+                 |                     |
+          +-------------+       +-------------+
+          |  CLIENT01   |       |  CLIENT02   |
+          |-------------|       |-------------|
+          | Windows     |       | Windows     |
+          | Workstation |       | Workstation |
+          +-------------+       +-------------+
 ```
 
 ### Component Responsibilities
@@ -356,7 +357,7 @@ Create a separate privileged administrative account for domain administration ra
 
 ### Account Provisioning
 
-When a new employee joins the organization, the administrator should:
+When a new employee joins Flux Comics, the administrator should:
 
 1. Confirm the employee's identity and department.
 2. Create the user account with an approved naming convention.
@@ -380,7 +381,7 @@ When an employee changes departments or responsibilities:
 
 ### Account Offboarding
 
-When an employee leaves the organization:
+When an employee leaves Flux Comics:
 
 1. Disable the account promptly.
 2. Revoke or terminate other active access mechanisms where applicable.
@@ -1384,7 +1385,7 @@ Each enhancement should solve a specific operational problem and include a way t
 
 ## 20. Project Outcome
 
-This project demonstrates how a small organization can use Windows Server and Active Directory to centralize identity management, organize computer and user objects, enforce access controls, and administer Windows workstations.
+This project demonstrates how Flux Comics can use Windows Server and Active Directory to centralize identity management, organize computer and user objects, enforce access controls, and administer Windows workstations.
 
 The lab emphasizes practical administration rather than configuration alone.
 
@@ -1401,4 +1402,4 @@ By completing the documented tests, scripts, and runbooks, the project provides 
 
 The environment is intentionally small and locally hosted. It is designed to demonstrate foundational Windows infrastructure skills while providing a clear path toward more advanced enterprise administration.
 
-**The goal is not simply to have a functioning domain
+**The goal is not simply to have a functioning domain, but to demonstrate the ability to design, administer, troubleshoot, secure, and document a Windows infrastructure environment.**
