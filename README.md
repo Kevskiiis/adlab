@@ -94,18 +94,18 @@ The lab includes 10 fictional employee accounts across four departments.
 
 ### Employee Directory
 
-| Name | Username | Department | Job Title |
-|---|---|---|---|
-| Marcus Bennett | `mbennett` | Management | Company Owner |
-| Olivia Chen | `ochen` | Management | Operations Manager |
-| Ethan Brooks | `ebrooks` | Retail Operations | Retail Supervisor |
-| Sophia Patel | `spatel` | Retail Operations | Sales Associate |
-| Noah Williams | `nwilliams` | Retail Operations | Inventory Specialist |
-| Ava Mitchell | `amitchell` | Publishing & Creative | Publishing Coordinator |
-| Lucas Rivera | `lrivera` | Publishing & Creative | Comic Artist |
-| Isabella Foster | `ifoster` | Publishing & Creative | Editor |
-| Daniel Murphy | `dmurphy` | IT & Administration | IT Support Technician |
-| Grace Thompson | `gthompson` | IT & Administration | IT Administrator |
+| Name | Department | Job Title |
+|---|---|---|
+| Marcus Bennett | Management | Company Owner |
+| Olivia Chen | Management | Operations Manager |
+| Ethan Brooks | Retail Operations | Retail Supervisor |
+| Sophia Patel | Retail Operations | Sales Associate |
+| Noah Williams | Retail Operations | Inventory Specialist |
+| Ava Mitchell | Publishing & Creative | Publishing Coordinator |
+| Lucas Rivera | Publishing & Creative | Comic Artist |
+| Isabella Foster | Publishing & Creative | Editor |
+| Daniel Murphy | IT & Administration | IT Support Technician |
+| Grace Thompson | IT & Administration | IT Administrator |
 
 All employee identities are fictional and created for this lab.
 
