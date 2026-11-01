@@ -1,88 +1,59 @@
-# Flux Comics — Active Directory & Windows Infrastructure Lab
+# Flux Comics - Active Directory and Windows Infrastructure Lab
 
 A hands-on Windows infrastructure lab focused on **Active Directory administration, identity and access management, Group Policy, and secure file sharing**.
 
-The lab simulates the IT environment of a fictional comic publishing and retail company, Flux Comics. It is designed to demonstrate practical Windows administration skills through a structured, security-focused environment.
+Flux Comics is a fictional comic publishing and retail company used to document a simulated Windows environment. The project demonstrates how directory services, security groups, file services, and endpoint policies work together in a small lab.
 
-> **Project status:** Active development. Active Directory, user accounts, organizational units, the DoomVault network share, NTFS access controls, and initial Group Policy controls have been implemented. Additional security policies and automation are in progress.
+> **Project status:** Active development. The core directory structure, user accounts, DoomVault file share, NTFS access model, and initial endpoint controls are implemented. Access validation, automation, and additional policy work are in progress.
 
----
+## Documentation
 
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Lab Environment](#lab-environment)
-- [Active Directory Structure](#active-directory-structure)
-- [Identity and Access Management](#identity-and-access-management)
-- [DoomVault File Server](#doomvault-file-server)
-- [Group Policy and Endpoint Security](#group-policy-and-endpoint-security)
-- [Planned Improvements](#planned-improvements)
-- [Skills Demonstrated](#skills-demonstrated)
-
----
-
-## Project Overview
-
-Flux Comics is a fictional organization with employees across Management, Retail Operations, Publishing & Creative, and IT & Administration.
-
-The lab models common infrastructure responsibilities, including:
-
-- Centralized user and computer management with Active Directory.
-- Organizational Units (OUs) for structured directory administration.
-- Global security groups for access management.
-- NTFS permissions and SMB file sharing.
-- Group Policy-based endpoint hardening.
-- Department-specific security controls.
-- Future automation of account provisioning and group membership.
-
-The goal is to build a practical environment for learning how Windows infrastructure components work together, while documenting the architecture and security decisions behind the implementation.
+- [Infrastructure](pages/infrastructure.html) - Virtualization, server roles, network, and lab constraints
+- [Active Directory](pages/active-directory.html) - Domain structure, OUs, and directory organization
+- [Identity and Access](pages/identity-access.html) - User scope, security group structure, and access mapping
+- [File Server](pages/file-server.html) - DoomVault, SMB, NTFS, and Access-Based Enumeration
+- [Group Policy](pages/group-policy.html) - Endpoint policy scope and implementation status
 
 ## Lab Environment
 
 | Component | Configuration |
 |---|---|
 | Organization | Flux Comics |
+| Hypervisor | VMware Workstation Pro |
+| Server | Windows Server 2025 virtual machine |
+| Clients | Two Windows 11 virtual machines |
 | Active Directory domain | `ad.comics.internal` |
-| Office location | Doomstadt |
-| Domain controller | Windows Server with AD DS and DNS |
-| File server | Windows Server |
-| Network share | `DoomVault` |
-| Client systems | Two Windows client machines |
-| Employee accounts | 10 fictional users |
+| Network | Custom VMnet with server IP reserved through DHCP |
+| Employee accounts | 10 fictional employees across four departments |
 
-Due to local hardware constraints, the domain controller and file server roles are hosted on the same Windows Server instance. This is a **lab-specific constraint**, not a recommended production architecture.
+The domain controller and file server roles run on the same Windows Server 2025 virtual machine because of local hardware limits. This is a lab constraint, not a production design.
 
-## Active Directory Structure
+## Architecture Overview
 
-The directory is organized to separate users, workstations, servers, and security groups.
+The lab separates directory objects into users, workstations, servers, distribution groups, and security groups.
 
-    Root
-    ├── Latveria
-    │   ├── Distribution Groups
-    │   ├── Security Groups
-    │   │   ├── Everyone
-    │   │   ├── IT & Administration
-    │   │   ├── Management
-    │   │   ├── Network Shares
-    │   │   ├── Publishing & Creative
-    │   │   └── Retail Operations
-    │   ├── Servers
-    │   └── Users
-    │       └── Doomstadt
-    │           ├── IT & Administration
-    │           ├── Management
-    │           ├── Publishing & Creative
-    │           └── Retail Operations
-    │
-    └── Workstations
-        └── Doomstadt
-            └── Retail Operations
+```text
+Root
+├── Latveria
+│   ├── Distribution Groups
+│   ├── Security Groups
+│   ├── Servers
+│   └── Users
+│       └── Doomstadt
+│           ├── IT & Administration
+│           ├── Management
+│           ├── Publishing & Creative
+│           └── Retail Operations
+└── Workstations
+    └── Doomstadt
+        └── Retail Operations
+```
 
-The OU structure provides a foundation for organizing directory objects and applying Group Policy based on administrative scope and workstation role.
+The environment uses AD DS and DNS for directory and name services. Group Policy provides centralized endpoint controls, while DoomVault provides SMB-based file storage.
 
-## Identity and Access Management
+## Identity and Access
 
-The lab includes 10 fictional employee accounts across four departments.
+The lab contains ten fictional employee accounts across four departments:
 
 | Department | Employees |
 |---|---:|
@@ -92,134 +63,90 @@ The lab includes 10 fictional employee accounts across four departments.
 | IT & Administration | 2 |
 | **Total** | **10** |
 
-### Employee Directory
+Security groups follow the general naming pattern:
 
-| Name | Department | Job Title |
-|---|---|---|
-| Marcus Bennett | Management | Company Owner |
-| Olivia Chen | Management | Operations Manager |
-| Ethan Brooks | Retail Operations | Retail Supervisor |
-| Sophia Patel | Retail Operations | Sales Associate |
-| Noah Williams | Retail Operations | Inventory Specialist |
-| Ava Mitchell | Publishing & Creative | Publishing Coordinator |
-| Lucas Rivera | Publishing & Creative | Comic Artist |
-| Isabella Foster | Publishing & Creative | Editor |
-| Daniel Murphy | IT & Administration | IT Support Technician |
-| Grace Thompson | IT & Administration | IT Administrator |
+```text
+<Type>_<Resource>_<Role>
+```
 
-All employee identities are fictional and created for this lab.
+The supported group type prefixes are **G** for Global, **DL** for Domain Local, and **U** for Universal. The SMB folder implementation currently uses Global groups such as:
 
-### Security Group Strategy
+- `G_Company_Read`
+- `G_Company_Modify`
 
-Global security groups are used to organize access to shared resources.
+Equivalent read and modify groups exist for the other DoomVault root folders. Group membership completion and effective access validation are still in progress.
 
-The lab uses a role-based naming convention that describes the resource and access level:
-
-- `G_<Resource>_Read`
-- `G_<Resource>_Modify`
-
-For example:
-
-| Group | Intended Access |
-|---|---|
-| `G_Company_Read` | Read access to the Company folder |
-| `G_Company_Modify` | Modify access to the Company folder |
-
-Equivalent read and modify groups have been created for the other root folders in DoomVault.
-
-This design separates **user identity from resource permissions**. Instead of assigning permissions directly to individual users, access is intended to be managed through security-group membership.
-
-User-to-group membership management and provisioning automation are still in progress.
+All employee identities and organizational details are fictional and created for this lab.
 
 ## DoomVault File Server
 
-The lab includes an SMB network share named **DoomVault**, hosted on the file server.
+DoomVault is the lab's SMB file share. It is stored on a dedicated virtual disk separate from the standard system disk.
 
 | Property | Configuration |
 |---|---|
+| Share name | `DoomVault` |
 | Local path | `E:\shares` |
-| SMB share name | `DoomVault` |
 | Network path | `\\<FileServerName>\DoomVault` |
-| SMB encryption in transit | Enabled |
+| Storage | Dedicated virtual disk `E:` |
+| SMB encryption | Enabled in transit |
 | Access-Based Enumeration | Enabled |
-| Folder-level access control | NTFS permissions |
+| Folder-level control | NTFS access control entries |
 
-### Folder Structure
+```text
+E:\shares\
+├── Company
+├── IT Software
+├── Management
+├── Publishing Creative
+└── Retail Operations
+```
 
-    E:\shares\
-    ├── Company
-    ├── IT Software
-    ├── Management
-    ├── Publishing Creative
-    └── Retail Operations
+Users connect through SMB. The share permission includes `Everyone`, while NTFS permissions and security group membership enforce effective access to folders and files. Share permissions and NTFS permissions work together; the `Everyone` share permission does not replace the NTFS controls. Access-Based Enumeration hides folders users cannot access, reducing visible attack surface and navigation noise.
 
-The share provides centralized storage for company-wide and department-specific resources.
+## Group Policy
 
-### Access Control Model
+Group Policy is being used to apply centralized controls to users and workstations. The current policy work focuses on endpoint security, workstation scope, session behavior, privilege handling, and centralized logon messaging.
 
-The SMB share currently has an `Everyone` share permission, while access is hardened at the folder level through NTFS permissions and security groups.
+Detailed GPO configuration, scope, validation, and future policy work are documented on the [Group Policy page](pages/group-policy.html).
 
-The intended access model is:
+## Current Status
 
-1. Users connect to DoomVault through SMB.
-2. NTFS permissions determine access to individual folders and files.
-3. Read and modify security groups provide access based on assigned responsibilities.
-4. Access-Based Enumeration helps hide folders that users do not have permission to access.
+### Implemented
 
-Share permissions and NTFS permissions work together to constrain network access. The `Everyone` share permission does not replace the NTFS access controls.
+- AD DS domain structure and OU hierarchy
+- Ten fictional employee accounts across four departments
+- DoomVault SMB share and folder structure
+- NTFS-based access model with security groups
+- SMB encryption in transit and Access-Based Enumeration
+- Initial Group Policy endpoint controls
 
-## Group Policy and Endpoint Security
+### In Progress
 
-Group Policy is being used to apply centralized security settings to users and workstations.
+- Security group membership completion
+- Effective access validation across folder permissions
+- Endpoint behavior validation
+- Additional Group Policy development
 
-The following policies have been implemented:
+### Planned
 
-| Group Policy | Scope | Purpose |
-|---|---|---|
-| Block All Removable Storage Devices | Retail Operations workstations | Restricts removable-storage device use |
-| Block Firewall Inbound | Retail Operations workstations | Blocks inbound firewall traffic according to the configured policy |
-| Logon Inactivity | All systems | Applies a 180-second inactivity limit |
-| Auto Deny Elevated Privilege | Retail Operations | Denies elevation requests for standard users rather than prompting for credentials |
-| Company Logon Message | Company systems | Displays a company logon title and message |
-
-These controls provide a starting point for centralized endpoint hardening and department-specific security enforcement.
-
-Additional user and computer policies are being developed to expand security coverage across the lab.
-
-## Planned Improvements
-
-The lab is actively evolving. Planned work includes:
-
-- Expanding Group Policy security controls for users and computers.
-- Completing and validating user-to-security-group membership.
-- Automating user account provisioning.
-- Automating department-based group membership.
-- Testing access to DoomVault with accounts from different departments.
-- Documenting permission troubleshooting and validation.
-- Continuing to refine the security baseline for workstations.
+- Account provisioning and group assignment automation
+- Expanded endpoint hardening controls
+- Additional troubleshooting and administration documentation
 
 ## Skills Demonstrated
 
-This project provides hands-on experience with:
-
 - Windows Server administration
 - Active Directory Domain Services
-- Active Directory Users, Groups, and Organizational Units
-- Global security groups and role-based access management
+- Active Directory users, groups, and Organizational Units
+- Security group and role-based access management
 - SMB network shares
 - NTFS permissions and access control
 - Access-Based Enumeration
 - SMB encryption in transit
 - Group Policy administration
 - Windows endpoint hardening
-- Department-specific security policies
-- Infrastructure documentation
-- Account provisioning and administration planning
+- Infrastructure documentation and administration planning
 
----
+## Lab Disclaimer
 
-## Project Outcome
-
-The Flux Comics lab demonstrates the development of a small-business Windows infrastructure environment, with centralized identity management, structured directory organization, controlled file sharing, and initial endpoint security policies.
-
-The project is being expanded with additional Group Policy controls, access validation, and automation to improve consistency and reduce manual administration.
+Flux Comics is fictional. All employees, departments, job titles, directory objects, and file contents are simulated for educational and portfolio demonstration only. The `ad.comics.internal` domain exists only inside the isolated lab.
