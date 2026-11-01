@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Identity and access management implementation for the lab.">
+  <title>Identity and Access | Active Directory Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../images/ActiveDirectoryLogo.png" type="image/png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script src="../assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><div class="brand-mark">IT</div><span class="brand-copy"><strong>Active Directory Lab</strong><small>Personal IT Portfolio Project</small></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+      <a href="../index.html">Overview</a>
+      <a href="infrastructure.html">Infrastructure</a>
+      <a href="active-directory.html">Active Directory</a>
+      <a class="active" href="identity-access.html">Identity and Access</a>
+      <a href="file-server.html">File Server</a>
+      <a href="group-policy.html">Group Policy</a>
+    </nav>
+  </header>
+
+  <main id="main" class="page-width">
+    <section class="doc-header">
+      <p class="doc-kicker">Report</p>
+      <h1>User Administration and Security Group Membership Model</h1>
+      <p class="doc-summary">This page covers the lab's user accounts, security groups, and how group membership maps to resource access.</p>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Summary</h2></div>
+      <ul class="list">
+        <li>Ten fictional accounts across four departments.</li>
+        <li>Access is granted through global security groups instead of individual user permissions.</li>
+        <li>Security groups follow the <code>&lt;Type&gt;_&lt;Resource&gt;_&lt;Role&gt;</code> naming pattern. SMB folder groups use <code>G_&lt;Resource&gt;_Read</code> / <code>G_&lt;Resource&gt;_Modify</code>.</li>
+        <li>Security group membership and effective access validation are in progress.</li>
+      </ul>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>User Scope by Department</h2></div>
+      <div class="table-wrap">
+        <table class="table-tech">
+          <thead><tr><th scope="col">Department</th><th scope="col">Users</th></tr></thead>
+          <tbody>
+            <tr><td>Management</td><td>2</td></tr>
+            <tr><td>Retail Operations</td><td>3</td></tr>
+            <tr><td>Publishing and Creative</td><td>3</td></tr>
+            <tr><td>IT and Administration</td><td>2</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>10</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Security Group Design and Access Mapping</h2></div>
+
+      <h3 style="margin-top: 16px; margin-bottom: 10px;">Access Model</h3>
+      <div class="diagram">
+        <span class="diagram-label">Access Evaluation Flow</span>
+<pre>User account
+└── Security group (&lt;Type&gt;_&lt;Resource&gt;_&lt;Role&gt;)
+    └── NTFS permission on the folder
+
+SMB share permission: Everyone
+Effective restriction: NTFS permissions and security group membership</pre>
+      </div>
+
+      <h3 style="margin-top: 20px; margin-bottom: 10px;">Group Structure and Naming Pattern</h3>
+      <div class="table-wrap">
+        <table class="table-tech">
+          <tbody>
+            <tr><th scope="row">Format</th><td><code>&lt;Type&gt;_&lt;Resource&gt;_&lt;Role&gt;</code></td></tr>
+            <tr><th scope="row">Type</th><td>G (Global), DL (Domain Local), or U (Universal)</td></tr>
+            <tr><th scope="row">Resource</th><td>The asset being protected (folder, application, service, etc.)</td></tr>
+            <tr><th scope="row">Role</th><td>The access level or responsibility (Read, Modify, Admin, etc.)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top: 20px; margin-bottom: 10px;">SMB Share Implementation</h3>
+      <div class="table-wrap">
+        <table class="table-tech">
+          <tbody>
+            <tr><th scope="row">Pattern example</th><td><code>G_Company_Read</code> and <code>G_Company_Modify</code></td></tr>
+            <tr><th scope="row">Folders protected</th><td>Company, IT Software, Management, Publishing Creative, and Retail Operations</td></tr>
+            <tr><th scope="row">Implementation</th><td>Global security groups with Read and Modify roles control access to DoomVault SMB root folders.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top: 20px; margin-bottom: 10px;">Implementation Details</h3>
+      <div class="grid-2">
+        <article class="panel"><h4 style="margin-top: 0;">Flexible structure</h4><p>The <code>&lt;Type&gt;_&lt;Resource&gt;_&lt;Role&gt;</code> naming pattern supports security groups across all resources in the environment, not limited to SMB shares.</p></article>
+        <article class="panel"><h4 style="margin-top: 0;">Group-based access</h4><p>Security groups of various types control access to resources instead of permissions being applied directly to user objects.</p></article>
+        <article class="panel"><h4 style="margin-top: 0;">SMB deployment status</h4><p>Global security groups with Read and Modify roles have been created for the DoomVault SMB root folders.</p></article>
+        <article class="panel"><h4 style="margin-top: 0;">Validation</h4><p>Security group membership completion and effective access validation are still in progress.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Employee Directory</h2></div>
+      <details>
+        <summary>Employee directory (ten simulated accounts)</summary>
+        <p class="section-summary">All names, titles, and usernames are simulated.</p>
+        <div class="table-wrap">
+          <table class="table-tech">
+            <thead><tr><th scope="col">Name</th><th scope="col">Username</th><th scope="col">Department</th><th scope="col">Job Title</th></tr></thead>
+            <tbody>
+              <tr><td>Marcus Bennett</td><td><code>mbennett</code></td><td>Management</td><td>Company Owner</td></tr>
+              <tr><td>Olivia Chen</td><td><code>ochen</code></td><td>Management</td><td>Operations Manager</td></tr>
+              <tr><td>Ethan Brooks</td><td><code>ebrooks</code></td><td>Retail Operations</td><td>Retail Supervisor</td></tr>
+              <tr><td>Sophia Patel</td><td><code>spatel</code></td><td>Retail Operations</td><td>Sales Associate</td></tr>
+              <tr><td>Noah Williams</td><td><code>nwilliams</code></td><td>Retail Operations</td><td>Inventory Specialist</td></tr>
+              <tr><td>Ava Mitchell</td><td><code>amitchell</code></td><td>Publishing and Creative</td><td>Publishing Coordinator</td></tr>
+              <tr><td>Lucas Rivera</td><td><code>lrivera</code></td><td>Publishing and Creative</td><td>Comic Artist</td></tr>
+              <tr><td>Isabella Foster</td><td><code>ifoster</code></td><td>Publishing and Creative</td><td>Editor</td></tr>
+              <tr><td>Daniel Murphy</td><td><code>dmurphy</code></td><td>IT and Administration</td><td>IT Support Technician</td></tr>
+              <tr><td>Grace Thompson</td><td><code>gthompson</code></td><td>IT and Administration</td><td>IT Administrator</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Design Decisions</h2></div>
+      <div class="grid-2">
+        <article class="panel"><h3>Groups instead of individual permissions</h3><p>Using groups separates user identity from resource permissions.</p></article>
+        <article class="panel"><h3>Separate read and modify groups</h3><p>Access is based on assigned responsibilities, supporting least privilege.</p></article>
+        <article class="panel"><h3>Resource-and-access naming</h3><p>The group name tells an administrator what it controls and at what level.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Production Considerations</h2></div>
+      <p class="section-summary">This lab is not a production design. Outside a lab, these are the changes I would make.</p>
+      <div class="grid-2">
+        <article class="panel"><h3>What I would change</h3><ul><li>Review: Define a documented process for identity lifecycle administration.</li><li>Review: Define a documented process for reviewing group membership.</li><li>Review: Establish a regular access review process.</li></ul></article>
+        <article class="panel"><h3>Not yet addressed in the lab</h3><ul><li>Password and lockout policy.</li><li>Auditing and logging.</li></ul></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Implementation Status</h2></div>
+      <div class="status-grid">
+        <article class="status-card implemented"><h3>Implemented</h3><ul><li>Ten AD DS user accounts and department mapping.</li><li>Global security group naming model and baseline group set.</li></ul></article>
+        <article class="status-card in-progress"><h3>In Progress</h3><ul><li>Security group membership completion.</li><li>Effective access validation against file server permissions.</li></ul></article>
+        <article class="status-card planned"><h3>Planned</h3><ul><li>Automation for account provisioning and membership assignment.</li></ul></article>
+      </div>
+      <nav class="related-nav"><a href="active-directory.html">Previous: Active Directory</a><a href="file-server.html">Next: File Server</a></nav>
+    </section>
+
+    <!--
+    <section class="section reveal">
+      <div class="section-title"><h2>Evidence</h2></div>
+      <figure>
+        <img src="../images/replace-with-screenshot.png" alt="Identity and access security group configuration screenshot">
+        <figcaption>Identity and access security group configuration screenshot.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Validation Evidence</h2></div>
+      <table class="table-tech">
+        <thead>
+          <tr><th scope="col">User</th><th scope="col">Folder</th><th scope="col">Expected access</th><th scope="col">Actual result</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </section>
+    -->
+  </main>
+</body>
+</html>

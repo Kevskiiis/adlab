@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Infrastructure details for the Active Directory lab.">
+  <title>Infrastructure | Active Directory Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script src="../assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><div class="brand-mark">IT</div><span class="brand-copy"><strong>Active Directory Lab</strong><small>Personal IT Portfolio Project</small></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+      <a href="../index.html">Overview</a>
+      <a class="active" href="infrastructure.html">Infrastructure</a>
+      <a href="active-directory.html">Active Directory</a>
+      <a href="identity-access.html">Identity and Access</a>
+      <a href="file-server.html">File Server</a>
+      <a href="group-policy.html">Group Policy</a>
+    </nav>
+  </header>
+
+  <main id="main" class="page-width">
+    <section class="doc-header">
+      <p class="doc-kicker">Report</p>
+      <h1>Lab Infrastructure</h1>
+      <p class="doc-summary">This page covers the lab’s server, client machines, virtualization platform, network, and storage, along with the design decisions behind them and what I would change in production.</p>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Summary</h2></div>
+      <ul class="list">
+        <li>Windows Server 2025 VM running AD DS, DNS, and file services.</li>
+        <li>Two domain-joined Windows 11 client VMs in VMware Workstation Pro.</li>
+        <li>Single forest and single domain <code>ad.comics.internal</code>.</li>
+        <li>Dedicated virtual disk for the DoomVault shares.</li>
+      </ul>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Platform and Virtualization</h2></div>
+      <div class="table-wrap">
+        <table class="table-tech">
+          <tbody>
+            <tr><th scope="row">Hypervisor</th><td>VMware Workstation Pro</td></tr>
+            <tr><th scope="row">Server</th><td>Windows Server 2025, one VM, running AD DS, DNS, and the file server role</td></tr>
+            <tr><th scope="row">Clients</th><td>Two Windows 11 VMs, domain-joined</td></tr>
+            <tr><th scope="row">Network</th><td>A custom VMnet in bridged mode</td></tr>
+            <tr><th scope="row">Server addressing</th><td>IP address reserved through a DHCP reservation on a router</td></tr>
+            <tr><th scope="row">Storage</th><td>Standard C: system disk, plus a separate virtual disk (E:) created specifically for the file server role to store shares</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Infrastructure Baseline</h2></div>
+      <div class="table-wrap">
+        <table class="table-tech">
+          <tbody>
+            <tr><th scope="row">Domain namespace</th><td><code>ad.comics.internal</code></td></tr>
+            <tr><th scope="row">Directory services</th><td>Active Directory Domain Services (AD DS)</td></tr>
+            <tr><th scope="row">Name services</th><td>Domain Name System (DNS) for domain operations</td></tr>
+            <tr><th scope="row">File services</th><td>DoomVault SMB share hosted on Windows Server</td></tr>
+            <tr><th scope="row">Endpoint scope</th><td>Two domain-joined Windows client systems</td></tr>
+            <tr><th scope="row">Forest and domain</th><td>Single forest with a single domain</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Server Role Responsibilities</h2></div>
+      <div class="grid-2">
+        <article class="panel"><h3>AD DS</h3><p>Hosts the single forest and domain, the OU structure, and the ten fictional accounts.</p></article>
+        <article class="panel"><h3>DNS</h3><p>Provides name resolution for domain authentication, service location, and endpoint registration.</p></article>
+        <article class="panel"><h3>File server</h3><p>Hosts DoomVault from the dedicated E: disk, with NTFS permissions, SMB encryption in transit, and Access-Based Enumeration.</p></article>
+        <article class="panel"><h3>Policy administration</h3><p>Uses a few computer-security GPOs scoped by OU, with user policies coming soon under least privilege.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Logical Topology</h2></div>
+      <div class="diagram">
+        <span class="diagram-label">Logical Topology Diagram</span>
+<pre>Host machine
+└── VMware Workstation Pro
+    ├── Custom VMnet (bridged)
+    ├── Windows Server 2025 VM
+    │   ├── C: system disk
+    │   ├── E: dedicated virtual disk for shares
+    │   ├── AD DS
+    │   ├── DNS
+    │   └── SMB File Services (DoomVault)
+    ├── Windows 11 client VM 01 (domain-joined)
+    └── Windows 11 client VM 02 (domain-joined)
+
+Router
+└── DHCP reservation for the server IP address</pre>
+      </div>
+      <p class="tech-note" style="margin-top:12px;">The domain controller and file server share one server because of local hardware limits. This is for the lab only, not a production design.</p>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Design Decisions</h2></div>
+      <div class="grid-2">
+        <article class="panel"><h3>Two roles on one server</h3><p>Hardware limits require the domain controller and file server to share one server. This is a lab decision, not a pattern to copy.</p></article>
+        <article class="panel"><h3>Dedicated disk for shares</h3><p>I created a separate virtual disk E: specifically for the file server role, keeping shares apart from C:.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Production Considerations</h2></div>
+      <p class="section-summary">This lab is not a production design. Outside a lab, these are the changes I would make.</p>
+      <div class="grid-2">
+        <article class="panel"><h3>What I would change</h3><ul><li>At least two domain controllers for redundancy.</li><li>A separate file server.</li><li>DNS available on more than one server.</li><li>Scheduled backups with tested restores.</li><li>A defined patching process.</li></ul></article>
+        <article class="panel"><h3>Not yet addressed in the lab</h3><ul><li>Backup and recovery.</li><li>Patch management.</li><li>Password and lockout policy.</li><li>Auditing and logging.</li></ul></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Implementation Status</h2></div>
+      <div class="status-grid">
+        <article class="status-card implemented"><h3>Implemented</h3><ul><li>Windows Server deployment for AD DS, DNS, and SMB services.</li><li>Domain context and endpoint participation baseline.</li><li>VMware Workstation Pro environment with a Windows Server 2025 VM and two Windows 11 client VMs on a bridged custom VMnet.</li></ul></article>
+        <article class="status-card in-progress"><h3>In Progress</h3><ul><li>Validation of policy and access behaviors across client systems.</li><li>Operational documentation refinement.</li></ul></article>
+        <article class="status-card planned"><h3>Planned</h3><ul><li>Additional troubleshooting documentation and administrative runbook depth.</li></ul></article>
+      </div>
+      <nav class="related-nav"><a href="../index.html">Return to Overview</a><a href="active-directory.html">Next: Active Directory</a></nav>
+    </section>
+
+    <!-- <section class="section reveal">
+      <div class="section-title"><h2>Evidence</h2></div> -->
+      <!--
+      <figure>
+        <img src="../images/replace-with-screenshot.png" alt="Infrastructure lab topology screenshot">
+        <figcaption>Infrastructure lab topology screenshot.</figcaption>
+      </figure>
+      -->
+    <!-- </section> -->
+  </main>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Personal Windows Server and Active Directory portfolio lab.">
+  <title>Active Directory Lab | Overview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <div class="brand-mark">IT</div>
+      <span class="brand-copy"><strong>Active Directory Lab</strong><small>Personal IT Portfolio Project</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+      <a class="active" href="index.html">Overview</a>
+      <a href="pages/infrastructure.html">Infrastructure</a>
+      <a href="pages/active-directory.html">Active Directory</a>
+      <a href="pages/identity-access.html">Identity and Access</a>
+      <a href="pages/file-server.html">File Server</a>
+      <a href="pages/group-policy.html">Group Policy</a>
+    </nav>
+  </header>
+
+  <main class="page-width">
+    <section class="doc-header">
+      <!-- <p class="doc-kicker">Technical Portfolio Overview</p> -->
+      <h1>Overview</h1>
+      <p class="doc-summary">This lab simulates the IT environment of Flux Comics, a fictional comic publishing and retail company with ten employees across four departments. I designed and maintain it to practice hands-on Windows infrastructure administration, focusing on Active Directory Domain Services (AD DS), Domain Name System (DNS), security group-based access control, Server Message Block (SMB) file services, and Group Policy Object (GPO) administration.</p>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Lab Scope and Data Disclaimer</h2></div>
+      <div class="tech-note">
+        Flux Comics isn’t a real company. I made it up just for this Active Directory and Windows lab. All the employees, user accounts, departments, job titles, organizational details, and file server contents are simulated. I’m not using any real employee information, company records, customer data, or confidential business information. The domain <code>ad.comics.internal</code> only exists in my isolated lab.
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Lab Environment Summary</h2></div>
+      <div class="environment-group">
+        <h3>Platform</h3>
+        <div class="table-wrap">
+          <table class="table-tech">
+            <tbody>
+              <tr><th scope="row">Hypervisor</th><td>VMware Workstation Pro</td></tr>
+              <tr><th scope="row">Server</th><td>Windows Server 2025 (single Virtual Machine)</td></tr>
+              <tr><th scope="row">Clients</th><td>Two Windows 11 Virtual Machines, domain-joined</td></tr>
+              <tr><th scope="row">Network</th><td>Custom VMnet for the lab</td></tr>
+              <tr><th scope="row">Server addressing</th><td>IP address reserved through a DHCP reservation on a router</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="environment-group">
+        <h3>Directory and Identity</h3>
+        <div class="table-wrap">
+          <table class="table-tech">
+            <tbody>
+              <tr><th scope="row">Domain</th><td><code>ad.comics.internal</code> (single forest, single domain)</td></tr>
+              <tr><th scope="row">Roles</th><td>AD DS and DNS</td></tr>
+              <tr><th scope="row">Structure</th><td>OUs separating users, workstations, servers, and groups</td></tr>
+              <tr><th scope="row">Accounts</th><td>Ten fictional employees across four departments</td></tr>
+              <tr><th scope="row">Access model</th><td>I have created a few security groups to control access to resources, such as SMB shares, for now.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="environment-group">
+        <h3>File Services</h3>
+        <div class="table-wrap">
+          <table class="table-tech">
+            <tbody>
+              <tr><th scope="row">Share</th><td>DoomVault at <code>E:\shares</code></td></tr>
+              <tr><th scope="row">Controls</th><td>NTFS folder permissions, SMB encryption in transit, and Access-Based Enumeration</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="environment-group">
+        <h3>Endpoint Management</h3>
+        <div class="table-wrap">
+          <table class="table-tech">
+            <tbody>
+              <tr><th scope="row">Group Policy</th><td>A few Group Policy Objects (five currently), all focused on computer security. I'm improving them and will add user policies very soon, following the principle of least privilege.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="environment-group">
+        <h3>Lab Constraints</h3>
+        <div class="table-wrap">
+          <table class="table-tech">
+            <tbody>
+              <tr><th scope="row">Single server</th><td>The domain controller and file server share one VM because of local hardware limits. This is for the lab only, not a production design.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Technical Documentation Areas</h2></div>
+      <p class="section-summary">Each page documents one implementation area with scope, configuration details, and status.</p>
+      <div class="page-links">
+        <a class="page-link" href="pages/infrastructure.html"><h3>Infrastructure</h3><p>Server role design, topology, and lab-specific deployment constraints.</p></a>
+        <a class="page-link" href="pages/active-directory.html"><h3>Active Directory</h3><p>OU hierarchy, directory object organization, and policy-scoping model.</p></a>
+        <a class="page-link" href="pages/identity-access.html"><h3>Identity and Access</h3><p>User accounts, security group strategy, and access mapping model.</p></a>
+        <a class="page-link" href="pages/file-server.html"><h3>File Server</h3><p>DoomVault configuration, SMB and NTFS control model, and ABE usage.</p></a>
+        <a class="page-link" href="pages/group-policy.html"><h3>Group Policy</h3><p>Configured GPOs, scope boundaries, endpoint behavior, and remaining work.</p></a>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Implementation Status</h2></div>
+      <p class="section-summary">Status is separated into implemented, in-progress, and planned work to distinguish current configuration from future development.</p>
+      <div class="status-grid">
+        <article class="status-card implemented">
+          <h3>Implemented</h3>
+          <ul>
+            <li>AD DS domain structure and Organizational Unit (OU) hierarchy.</li>
+            <li>Ten fictional user accounts aligned to four departments.</li>
+            <li>DoomVault SMB share with folder segmentation and NTFS control model.</li>
+            <li>SMB encryption in transit and Access-Based Enumeration (ABE).</li>
+            <li>Initial GPO set for endpoint hardening controls.</li>
+          </ul>
+        </article>
+        <article class="status-card in-progress">
+          <h3>In Progress</h3>
+          <ul>
+            <li>Security group membership completion and effective access validation.</li>
+            <li>Cross-department file access verification against expected permissions.</li>
+            <li>Additional user and computer GPO development.</li>
+          </ul>
+        </article>
+        <article class="status-card planned">
+          <h3>Planned</h3>
+          <ul>
+            <li>Automation for account provisioning and group assignment workflows.</li>
+            <li>Expanded endpoint hardening controls and validation procedures.</li>
+            <li>Additional troubleshooting and administration runbook documentation.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer page-width">
+    <div class="footer-stack">
+      <p class="footer-meta">© 2026 Kevskiiis · IT Project Documentation · Active Development</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="File server implementation for the Active Directory lab.">
+  <title>File Server | Active Directory Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../images/ActiveDirectoryLogo.png" type="image/png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script src="../assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><div class="brand-mark">IT</div><span class="brand-copy"><strong>Active Directory Lab</strong><small>Personal IT Portfolio Project</small></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+      <a href="../index.html">Overview</a>
+      <a href="infrastructure.html">Infrastructure</a>
+      <a href="active-directory.html">Active Directory</a>
+      <a href="identity-access.html">Identity and Access</a>
+      <a class="active" href="file-server.html">File Server</a>
+      <a href="group-policy.html">Group Policy</a>
+    </nav>
+  </header>
+
+  <main id="main" class="page-width">
+    <section class="doc-header">
+      <p class="doc-kicker">Report</p>
+      <h1>DoomVault SMB and NTFS Access Architecture</h1>
+      <p class="doc-summary">This page covers the DoomVault file share, its folder structure, and how SMB, NTFS, security groups, and Access-Based Enumeration control access.</p>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Summary</h2></div>
+      <ul class="list">
+        <li>DoomVault file share hosted on a dedicated virtual disk (E:) separate from the system disk.</li>
+        <li>NTFS permissions enforce folder-level access through security group membership.</li>
+        <li>SMB encryption in transit and Access-Based Enumeration (ABE) are enabled.</li>
+        <li>Effective access validation is in progress.</li>
+      </ul>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Share Configuration</h2></div>
+      <div class="table-wrap">
+        <table class="table-tech">
+          <tbody>
+            <tr><th scope="row">Share name</th><td><code>DoomVault</code></td></tr>
+            <tr><th scope="row">Local path</th><td><code>E:\shares</code></td></tr>
+            <tr><th scope="row">Network path</th><td><code>\\&lt;FileServerName&gt;\DoomVault</code></td></tr>
+            <tr><th scope="row">SMB encryption</th><td>Enabled in transit</td></tr>
+            <tr><th scope="row">ABE state</th><td>Enabled</td></tr>
+            <tr><th scope="row">Folder-level control</th><td>NTFS access control entries (ACEs)</td></tr>
+            <tr><th scope="row">Hosted on</th><td>Windows Server 2025 VM, dedicated virtual disk (E:)</td></tr>
+            <tr><th scope="row">Access groups</th><td>Global security groups named G_&lt;Resource&gt;_Read and G_&lt;Resource&gt;_Modify</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Folder Structure</h2></div>
+      <div class="diagram">
+        <span class="diagram-label">DoomVault Directory Layout</span>
+<pre>E:\shares\
+├── Company
+├── IT Software
+├── Management
+├── Publishing Creative
+└── Retail Operations</pre>
+      </div>
+      <div class="table-wrap" style="margin-top: 14px;">
+        <table class="table-tech">
+          <thead><tr><th scope="col">Folder</th><th scope="col">Matching groups</th></tr></thead>
+          <tbody>
+            <tr><td>Company</td><td><code>G_Company_Read</code> and <code>G_Company_Modify</code></td></tr>
+            <tr><td>IT Software</td><td>Read and modify groups follow the same naming pattern</td></tr>
+            <tr><td>Management</td><td>Read and modify groups follow the same naming pattern</td></tr>
+            <tr><td>Publishing Creative</td><td>Read and modify groups follow the same naming pattern</td></tr>
+            <tr><td>Retail Operations</td><td>Read and modify groups follow the same naming pattern</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Access Control Model</h2></div>
+
+      <h3 style="margin-top: 16px; margin-bottom: 10px;">Access Request Path</h3>
+      <div class="diagram">
+        <span class="diagram-label">Access Request Flow</span>
+<pre>User connects over SMB
+└── Share permission (Everyone) allows connection
+    └── NTFS permissions via security group decide access
+        └── Access-Based Enumeration controls folder visibility</pre>
+      </div>
+
+      <h3 style="margin-top: 20px; margin-bottom: 10px;">Implementation Details</h3>
+      <div class="grid-2">
+        <article class="panel"><h4 style="margin-top: 0;">SMB connectivity</h4><p>Users connect to the DoomVault share over SMB. The share permission includes Everyone, allowing the connection attempt to proceed.</p></article>
+        <article class="panel"><h4 style="margin-top: 0;">NTFS enforcement</h4><p>NTFS permissions tied to security groups determine actual access to folders and files. Users must be members of the appropriate G_&lt;Resource&gt;_Read or G_&lt;Resource&gt;_Modify group to access folder content.</p></article>
+        <article class="panel"><h4 style="margin-top: 0;">Visibility control</h4><p>Access-Based Enumeration hides folders for which a user lacks access rights, reducing visible attack surface and navigation noise.</p></article>
+        <article class="panel"><h4 style="margin-top: 0;">Validation status</h4><p>Security group membership completion and effective access validation are in progress.</p></article>
+      </div>
+
+      <h3 style="margin-top: 20px; margin-bottom: 10px;">Security Notes</h3>
+      <p style="font-size: 0.95rem; color: var(--ink-soft);">Current share-level permission includes <code>Everyone</code>. Effective security is enforced through NTFS controls and security group membership, which work together to constrain network access. The Everyone share permission does not replace the NTFS controls.</p>
+      <p style="margin-top: 10px; font-size: 0.95rem; color: var(--ink-soft);">All file content in this environment is simulated data used for educational and portfolio demonstration only.</p>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Design Decisions</h2></div>
+      <div class="grid-2">
+        <article class="panel"><h3>Dedicated disk for shares</h3><p>A separate virtual disk (E:) was created specifically for the file server role to store shares, keeping them apart from the system disk (C:).</p></article>
+        <article class="panel"><h3>NTFS for folder-level access</h3><p>Access is hardened at the folder level through NTFS permissions and security groups rather than generic share-level controls.</p></article>
+        <article class="panel"><h3>Access-Based Enumeration</h3><p>ABE hides folders users cannot access, reducing visible attack surface and navigation noise.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Production Considerations</h2></div>
+      <p class="section-summary">This lab is not a production design. Outside a lab, these are the changes I would make.</p>
+      <div class="grid-2">
+        <article class="panel"><h3>What I would change</h3><ul><li>Move the file server onto its own server separate from the domain controller.</li><li>Review: Define and implement a backup and recovery strategy.</li><li>Review: Establish patch management procedures for OS and SMB stack updates.</li></ul></article>
+        <article class="panel"><h3>Not yet addressed in the lab</h3><ul><li>Backup and recovery.</li><li>Patch management.</li><li>Auditing and logging.</li></ul></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Implementation Status</h2></div>
+      <div class="status-grid">
+        <article class="status-card implemented"><h3>Implemented</h3><ul><li>DoomVault share and folder hierarchy.</li><li>SMB encryption in transit and Access-Based Enumeration configuration.</li><li>NTFS-driven access model with read and modify group structure.</li></ul></article>
+        <article class="status-card in-progress"><h3>In Progress</h3><ul><li>Security group membership completion.</li><li>Effective access validation across department account contexts.</li></ul></article>
+        <article class="status-card planned"><h3>Planned</h3><ul><li>Expanded test coverage for access validation workflows.</li></ul></article>
+      </div>
+      <nav class="related-nav"><a href="identity-access.html">Previous: Identity and Access</a><a href="group-policy.html">Next: Group Policy</a></nav>
+    </section>
+
+    <!--
+    <section class="section reveal">
+      <div class="section-title"><h2>Evidence</h2></div>
+      <figure>
+        <img src="../images/replace-with-screenshot.png" alt="DoomVault file share and folder structure with security group permissions screenshot">
+        <figcaption>DoomVault file share and folder structure with security group permissions screenshot.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Validation Evidence</h2></div>
+      <table class="table-tech">
+        <thead>
+          <tr><th scope="col">User</th><th scope="col">Folder</th><th scope="col">Expected access</th><th scope="col">Actual result</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </section>
+    -->
+  </main>
+
+</body>
+</html>

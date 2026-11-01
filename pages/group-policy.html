@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Group Policy implementation details for the Active Directory lab.">
+  <title>Group Policy | Active Directory Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../images/ActiveDirectoryLogo.png" type="image/png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script src="../assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><div class="brand-mark">IT</div><span class="brand-copy"><strong>Active Directory Lab</strong><small>Personal IT Portfolio Project</small></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+      <a href="../index.html">Overview</a>
+      <a href="infrastructure.html">Infrastructure</a>
+      <a href="active-directory.html">Active Directory</a>
+      <a href="identity-access.html">Identity and Access</a>
+      <a href="file-server.html">File Server</a>
+      <a class="active" href="group-policy.html">Group Policy</a>
+    </nav>
+  </header>
+
+  <main id="main" class="page-width">
+    <section class="doc-header">
+      <p class="doc-kicker">Report</p>
+      <h1>Group Policy Object (GPO) Configuration and Endpoint Scope</h1>
+      <p class="doc-summary">This page covers centralized endpoint controls applied through Group Policy Objects to specific user and workstation scopes.</p>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Summary</h2></div>
+      <ul class="list">
+        <li>Five baseline GPO configurations targeting specific scopes: Retail Operations, company systems, and all systems.</li>
+        <li>GPOs control removable storage, firewall inbound rules, session timeout, privilege elevation, and logon messaging.</li>
+        <li>Policies are organized by scope to preserve targeted behavior and least-privilege operation.</li>
+        <li>Endpoint behavior validation is in progress.</li>
+      </ul>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Configured GPO Baseline</h2></div>
+      <div class="table-wrap">
+        <table class="table-tech">
+          <thead>
+            <tr>
+              <th scope="col">GPO</th>
+              <th scope="col">Purpose</th>
+              <th scope="col">Scope</th>
+              <th scope="col">Technical behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Block All Removable Storage Devices</td>
+              <td>Reduce unmanaged data transfer risk.</td>
+              <td>Retail Operations workstations</td>
+              <td>Prevents removable-storage device usage.</td>
+            </tr>
+            <tr>
+              <td>Block Firewall Inbound</td>
+              <td>Reduce inbound exposure on managed endpoints.</td>
+              <td>Retail Operations workstations</td>
+              <td>Blocks inbound traffic according to configured firewall policy.</td>
+            </tr>
+            <tr>
+              <td>Logon Inactivity</td>
+              <td>Apply baseline session timeout behavior.</td>
+              <td>All systems</td>
+              <td>Applies a 180-second inactivity limit.</td>
+            </tr>
+            <tr>
+              <td>Auto Deny Elevated Privilege</td>
+              <td>Reinforce least-privilege operation.</td>
+              <td>Retail Operations</td>
+              <td>Denies elevation requests for standard users.</td>
+            </tr>
+            <tr>
+              <td>Company Logon Message</td>
+              <td>Demonstrate centralized logon messaging control.</td>
+              <td>Company systems</td>
+              <td>Displays configured logon title and message.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Scope and Implementation</h2></div>
+      <div class="grid-2">
+        <article class="panel"><h3>Scope model</h3><p>Retail Operations controls are intentionally separated from broadly scoped policies to preserve targeted behavior and avoid unintended impact on other endpoints.</p></article>
+        <article class="panel"><h3>Least privilege focus</h3><p>GPO configurations reinforce least-privilege operation through elevation denial, inactivity timeouts, and device restrictions on sensitive workstations.</p></article>
+        <article class="panel"><h3>Validation approach</h3><p>Policy outcomes are being validated across endpoints as group membership and access testing are completed in parallel workstreams.</p></article>
+        <article class="panel"><h3>Centralized control</h3><p>GPOs enable centralized management of security baselines, messaging, and behavioral controls across the managed environment.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Design Decisions</h2></div>
+      <div class="grid-2">
+        <article class="panel"><h3>Separated Retail Operations policies</h3><p>Removable storage and firewall policies are scoped to Retail Operations workstations only, reducing risk without affecting other departments.</p></article>
+        <article class="panel"><h3>Universal inactivity timeout</h3><p>Session timeout applies to all systems, enforcing a consistent baseline behavior across the environment.</p></article>
+        <article class="panel"><h3>Elevation denial enforcement</h3><p>Denying elevation requests for standard users reinforces least privilege without requiring complex access control changes.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Production Considerations</h2></div>
+      <p class="section-summary">This lab is not a production design. Outside a lab, these are the changes I would make.</p>
+      <div class="grid-2">
+        <article class="panel"><h3>What I would change</h3><ul><li>Review: Define and test additional hardening policies based on security baseline requirements.</li><li>Review: Implement detailed GPO audit and filtering to track policy application and compliance.</li><li>Review: Establish procedures for policy version control and change documentation.</li></ul></article>
+        <article class="panel"><h3>Not yet addressed in the lab</h3><ul><li>Audit and logging of policy application.</li><li>Policy version control and documentation.</li><li>Compliance reporting and policy drift detection.</li></ul></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Implementation Status</h2></div>
+      <div class="status-grid">
+        <article class="status-card implemented"><h3>Implemented</h3><ul><li>Five baseline GPO configurations with defined scope.</li><li>Centralized endpoint policy model for managed systems.</li><li>Least-privilege and behavioral controls applied to target workstations.</li></ul></article>
+        <article class="status-card in-progress"><h3>In Progress</h3><ul><li>Endpoint behavior validation and baseline refinement.</li><li>Policy application verification across managed systems.</li></ul></article>
+        <article class="status-card planned"><h3>Planned</h3><ul><li>Additional hardening controls for future iterations.</li><li>Expanded documentation of policy outcomes and troubleshooting.</li></ul></article>
+      </div>
+      <nav class="related-nav"><a href="file-server.html">Previous: File Server</a><a href="../index.html">Return to Overview</a></nav>
+    </section>
+
+    <!--
+    <section class="section reveal">
+      <div class="section-title"><h2>Evidence</h2></div>
+      <figure>
+        <img src="../images/replace-with-screenshot.png" alt="Group Policy Objects console showing configured policies and linked scopes">
+        <figcaption>Group Policy Objects console showing configured policies and linked scopes.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Validation Evidence</h2></div>
+      <table class="table-tech">
+        <thead>
+          <tr><th scope="col">GPO</th><th scope="col">Target</th><th scope="col">Expected behavior</th><th scope="col">Actual result</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </section>
+    -->
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2025 Active Directory Lab Portfolio. All content is educational and simulated.</p>
+  </footer>
+</body>
+</html>

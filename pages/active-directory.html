@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Active Directory implementation details for the lab.">
+  <title>Active Directory | Active Directory Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../images/ActiveDirectoryLogo.png" type="image/png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script src="../assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><div class="brand-mark">IT</div><span class="brand-copy"><strong>Active Directory Lab</strong><small>Personal IT Portfolio Project</small></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">Toggle navigation</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+      <a href="../index.html">Overview</a>
+      <a href="infrastructure.html">Infrastructure</a>
+      <a class="active" href="active-directory.html">Active Directory</a>
+      <a href="identity-access.html">Identity and Access</a>
+      <a href="file-server.html">File Server</a>
+      <a href="group-policy.html">Group Policy</a>
+    </nav>
+  </header>
+
+  <main id="main" class="page-width">
+    <section class="doc-header">
+      <p class="doc-kicker">Report</p>
+      <h1>AD DS Namespace and OU Hierarchy</h1>
+      <p class="doc-summary">This page covers the domain namespace, the Organizational Unit structure, and how it supports account administration, group management, and policy scoping.</p>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Summary</h2></div>
+      <ul class="list">
+        <li>Single forest and single domain: <code>ad.comics.internal</code>.</li>
+        <li>OU structure separating users, security groups, servers, and workstations.</li>
+        <li>Ten fictional employee accounts across four departments.</li>
+        <li>Group Policy scoped by OU, including separate Retail Operations workstation controls.</li>
+      </ul>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Domain Configuration</h2></div>
+      <div class="table-wrap">
+        <table class="table-tech">
+          <tbody>
+            <tr><th scope="row">Domain namespace</th><td><code>ad.comics.internal</code></td></tr>
+            <tr><th scope="row">Directory service role</th><td>AD DS on a Windows Server 2025 VM, alongside DNS and the file server role</td></tr>
+            <tr><th scope="row">Primary objective</th><td>Centralized identity administration and OU-scoped policy management</td></tr>
+            <tr><th scope="row">Forest and domain</th><td>Single forest with a single domain</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>OU Hierarchy</h2></div>
+      <div class="diagram">
+        <span class="diagram-label">Organizational Unit (OU) Hierarchy</span>
+<pre>Root
+├── Latveria
+│   ├── Distribution Groups
+│   ├── Security Groups
+│   │   ├── Everyone
+│   │   ├── IT & Administration
+│   │   ├── Management
+│   │   ├── Network Shares
+│   │   ├── Publishing & Creative
+│   │   └── Retail Operations
+│   ├── Servers
+│   └── Users
+│       └── Doomstadt
+│           ├── IT & Administration
+│           ├── Management
+│           ├── Publishing & Creative
+│           └── Retail Operations
+│
+└── Workstations
+    └── Doomstadt
+        └── Retail Operations</pre>
+      </div>
+      <div class="table-wrap" style="margin-top:14px;">
+        <table class="table-tech">
+          <tbody>
+            <tr><th scope="row">Users</th><td>Department OUs under Users &gt; Doomstadt</td></tr>
+            <tr><th scope="row">Security Groups</th><td>Everyone is a security group every employee belongs to by default; Network Shares holds security groups that designate access to specific folders inside the DoomVault share.</td></tr>
+            <tr><th scope="row">Servers</th><td>Servers</td></tr>
+            <tr><th scope="row">Distribution Groups</th><td>Distribution groups</td></tr>
+            <tr><th scope="row">Workstations</th><td>Retail Operations under Workstations &gt; Doomstadt; more workstation OUs are planned.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Administrative Behavior and Scope</h2></div>
+      <div class="grid-2">
+        <article class="panel"><h3>Purpose</h3><p>I use the OU hierarchy to isolate object types and support predictable policy application.</p></article>
+        <article class="panel"><h3>Implementation</h3><p>Users, security groups, servers, and workstations are placed in their corresponding OU branches. Ten fictional employee accounts are placed in the department OUs under Users &gt; Doomstadt. Everyone is a default security group for employees, while Network Shares holds groups for access to specific DoomVault folders.</p></article>
+        <article class="panel"><h3>Scope</h3><p>Retail Operations is one workstation OU, and its computer controls are scoped separately from other containers. A few computer-security GPOs are scoped by OU, and user policies are coming soon under least privilege.</p></article>
+        <article class="panel"><h3>Validation</h3><p>Policy behavior and effective access validation are in progress.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Design Decisions</h2></div>
+      <div class="grid-2">
+        <article class="panel"><h3>Separate OU branches by object type</h3><p>I separated object types into OU branches to support predictable policy application.</p></article>
+        <article class="panel"><h3>Retail Operations workstations in their own branch</h3><p>Retail Operations workstations are in their own branch so their controls can be scoped separately from management and infrastructure containers, alongside other workstation OUs.</p></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Production Considerations</h2></div>
+      <p class="section-summary">This lab is not a production design. Outside a lab, these are the changes I would make.</p>
+      <div class="grid-2">
+        <article class="panel"><h3>What I would change</h3><ul><li>Review: Keep OU structure aligned to administrative scope.</li><li>Review: Document delegated administration boundaries.</li><li>Review: Review OU-linked GPO scope before applying changes.</li></ul></article>
+        <article class="panel"><h3>Not yet addressed in the lab</h3><ul><li>Password and lockout policy.</li><li>Auditing and logging.</li></ul></article>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-title"><h2>Implementation Status</h2></div>
+      <div class="status-grid">
+        <article class="status-card implemented"><h3>Implemented</h3><ul><li>AD DS domain structure and OU hierarchy.</li><li>Ten fictional user accounts aligned to four departments.</li></ul></article>
+        <article class="status-card in-progress"><h3>In Progress</h3><ul><li>Security group membership completion and effective access validation.</li><li>Policy behavior validation.</li></ul></article>
+        <article class="status-card planned"><h3>Planned</h3><ul><li>More OUs under Workstations.</li></ul></article>
+      </div>
+      <nav class="related-nav"><a href="infrastructure.html">Previous: Infrastructure</a><a href="identity-access.html">Next: Identity and Access</a></nav>
+    </section>
+
+    <!--
+    <section class="section reveal">
+      <div class="section-title"><h2>Evidence</h2></div>
+      <figure>
+        <img src="../images/replace-with-screenshot.png" alt="Active Directory OU hierarchy screenshot">
+        <figcaption>Active Directory OU hierarchy screenshot.</figcaption>
+      </figure>
+    </section>
+    -->
+  </main>
+
+</body>
+</html>
