@@ -209,6 +209,12 @@ h3 { font-size: 1.04rem; }
   font-size: 0.9rem;
 }
 
+.subsection-title { margin: 10px 0 5px; }
+.subsection-title:first-child { margin-top: 28px; }
+.spaced-table { margin-top: 14px; }
+.panel h4 { margin-top: 0; }
+.muted-note { color: var(--ink-soft); font-size: 0.95rem; }
+
 .status-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

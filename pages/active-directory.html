@@ -29,8 +29,7 @@
 
   <main id="main" class="page-width">
     <section class="doc-header">
-      <p class="doc-kicker">Report</p>
-      <h1>AD DS Namespace and OU Hierarchy</h1>
+      <h1>Active Directory</h1>
       <p class="doc-summary">This page covers the domain namespace, the Organizational Unit structure, and how it supports account administration, group management, and policy scoping.</p>
     </section>
 
@@ -39,8 +38,8 @@
       <ul class="list">
         <li>Single forest and single domain: <code>ad.comics.internal</code>.</li>
         <li>OU structure separating users, security groups, servers, and workstations.</li>
-        <li>Ten fictional employee accounts across four departments.</li>
-        <li>Group Policy scoped by OU, including separate Retail Operations workstation controls.</li>
+        <li>Directory organization provides the foundation for identity administration and policy scope.</li>
+        <li>More workstation OUs are planned as the lab expands.</li>
       </ul>
     </section>
 
@@ -50,7 +49,7 @@
         <table class="table-tech">
           <tbody>
             <tr><th scope="row">Domain namespace</th><td><code>ad.comics.internal</code></td></tr>
-            <tr><th scope="row">Directory service role</th><td>AD DS on a Windows Server 2025 VM, alongside DNS and the file server role</td></tr>
+            <tr><th scope="row">Directory service role</th><td>AD DS on a Windows Server 2025 VM, alongside DNS</td></tr>
             <tr><th scope="row">Primary objective</th><td>Centralized identity administration and OU-scoped policy management</td></tr>
             <tr><th scope="row">Forest and domain</th><td>Single forest with a single domain</td></tr>
           </tbody>
@@ -84,7 +83,7 @@
     └── Doomstadt
         └── Retail Operations</pre>
       </div>
-      <div class="table-wrap" style="margin-top:14px;">
+      <div class="table-wrap spaced-table">
         <table class="table-tech">
           <tbody>
             <tr><th scope="row">Users</th><td>Department OUs under Users &gt; Doomstadt</td></tr>
@@ -101,9 +100,9 @@
       <div class="section-title"><h2>Administrative Behavior and Scope</h2></div>
       <div class="grid-2">
         <article class="panel"><h3>Purpose</h3><p>I use the OU hierarchy to isolate object types and support predictable policy application.</p></article>
-        <article class="panel"><h3>Implementation</h3><p>Users, security groups, servers, and workstations are placed in their corresponding OU branches. Ten fictional employee accounts are placed in the department OUs under Users &gt; Doomstadt. Everyone is a default security group for employees, while Network Shares holds groups for access to specific DoomVault folders.</p></article>
-        <article class="panel"><h3>Scope</h3><p>Retail Operations is one workstation OU, and its computer controls are scoped separately from other containers. A few computer-security GPOs are scoped by OU, and user policies are coming soon under least privilege.</p></article>
-        <article class="panel"><h3>Validation</h3><p>Policy behavior and effective access validation are in progress.</p></article>
+        <article class="panel"><h3>Implementation</h3><p>Users, security groups, servers, and workstations are placed in their corresponding OU branches. Department accounts are organized under Users &gt; Doomstadt.</p></article>
+        <article class="panel"><h3>Scope</h3><p>Retail Operations is one workstation OU, and its computer controls are scoped separately from other containers. Group Policy details are documented on the Group Policy page.</p></article>
+        <article class="panel"><h3>Validation</h3><p>The OU structure and policy scope are being refined as the lab expands.</p></article>
       </div>
     </section>
 
@@ -144,6 +143,10 @@
     </section>
     -->
   </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Active Directory Lab Portfolio. All content is educational and simulated.</p>
+  </footer>
 
 </body>
 </html>

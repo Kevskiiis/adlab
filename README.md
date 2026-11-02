@@ -23,6 +23,7 @@ Flux Comics is a fictional comic publishing and retail company used to document 
 | Server | Windows Server 2025 virtual machine |
 | Clients | Two Windows 11 virtual machines |
 | Active Directory domain | `ad.comics.internal` |
+| DNS forwarders | Cloudflare (`1.1.1.1`) primary; Quad9 (`9.9.9.9`) fallback |
 | Network | Custom VMnet with server IP reserved through DHCP |
 | Employee accounts | 10 fictional employees across four departments |
 
@@ -49,7 +50,7 @@ Root
         └── Retail Operations
 ```
 
-The environment uses AD DS and DNS for directory and name services. Group Policy provides centralized endpoint controls, while DoomVault provides SMB-based file storage.
+The environment uses AD DS and internal DNS for directory and name services. External DNS queries forward to Cloudflare (`1.1.1.1`) first, with Quad9 (`9.9.9.9`) available as a fallback for speed, reliability, and privacy/security. Group Policy provides centralized endpoint controls, while DoomVault provides SMB-based file storage.
 
 ## Identity and Access
 

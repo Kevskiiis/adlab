@@ -28,8 +28,7 @@
 
   <main id="main" class="page-width">
     <section class="doc-header">
-      <p class="doc-kicker">Report</p>
-      <h1>Lab Infrastructure</h1>
+      <h1>Infrastructure</h1>
       <p class="doc-summary">This page covers the lab’s server, client machines, virtualization platform, network, and storage, along with the design decisions behind them and what I would change in production.</p>
     </section>
 
@@ -37,6 +36,7 @@
       <div class="section-title"><h2>Summary</h2></div>
       <ul class="list">
         <li>Windows Server 2025 VM running AD DS, DNS, and file services.</li>
+        <li>External DNS queries forward to Cloudflare first, with Quad9 configured as the fallback.</li>
         <li>Two domain-joined Windows 11 client VMs in VMware Workstation Pro.</li>
         <li>Single forest and single domain <code>ad.comics.internal</code>.</li>
         <li>Dedicated virtual disk for the DoomVault shares.</li>
@@ -50,6 +50,7 @@
           <tbody>
             <tr><th scope="row">Hypervisor</th><td>VMware Workstation Pro</td></tr>
             <tr><th scope="row">Server</th><td>Windows Server 2025, one VM, running AD DS, DNS, and the file server role</td></tr>
+            <tr><th scope="row">DNS forwarders</th><td>Cloudflare (<code>1.1.1.1</code>) as the primary forwarder; Quad9 (<code>9.9.9.9</code>) as the fallback</td></tr>
             <tr><th scope="row">Clients</th><td>Two Windows 11 VMs, domain-joined</td></tr>
             <tr><th scope="row">Network</th><td>A custom VMnet in bridged mode</td></tr>
             <tr><th scope="row">Server addressing</th><td>IP address reserved through a DHCP reservation on a router</td></tr>
@@ -60,28 +61,12 @@
     </section>
 
     <section class="section reveal">
-      <div class="section-title"><h2>Infrastructure Baseline</h2></div>
-      <div class="table-wrap">
-        <table class="table-tech">
-          <tbody>
-            <tr><th scope="row">Domain namespace</th><td><code>ad.comics.internal</code></td></tr>
-            <tr><th scope="row">Directory services</th><td>Active Directory Domain Services (AD DS)</td></tr>
-            <tr><th scope="row">Name services</th><td>Domain Name System (DNS) for domain operations</td></tr>
-            <tr><th scope="row">File services</th><td>DoomVault SMB share hosted on Windows Server</td></tr>
-            <tr><th scope="row">Endpoint scope</th><td>Two domain-joined Windows client systems</td></tr>
-            <tr><th scope="row">Forest and domain</th><td>Single forest with a single domain</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="section reveal">
       <div class="section-title"><h2>Server Role Responsibilities</h2></div>
       <div class="grid-2">
         <article class="panel"><h3>AD DS</h3><p>Hosts the single forest and domain, the OU structure, and the ten fictional accounts.</p></article>
-        <article class="panel"><h3>DNS</h3><p>Provides name resolution for domain authentication, service location, and endpoint registration.</p></article>
-        <article class="panel"><h3>File server</h3><p>Hosts DoomVault from the dedicated E: disk, with NTFS permissions, SMB encryption in transit, and Access-Based Enumeration.</p></article>
-        <article class="panel"><h3>Policy administration</h3><p>Uses a few computer-security GPOs scoped by OU, with user policies coming soon under least privilege.</p></article>
+        <article class="panel"><h3>DNS</h3><p>Provides internal name resolution for domain authentication, service location, and endpoint registration. External queries forward to Cloudflare (<code>1.1.1.1</code>) first, then Quad9 (<code>9.9.9.9</code>) as fallback.</p></article>
+        <article class="panel"><h3>File server</h3><p>Hosts the DoomVault share from the dedicated E: disk. The file-service controls are documented separately on the File Server page.</p></article>
+        <article class="panel"><h3>Platform boundary</h3><p>This page establishes the system context for the directory, identity, file-service, and endpoint chapters that follow.</p></article>
       </div>
     </section>
 
@@ -96,7 +81,7 @@
     │   ├── C: system disk
     │   ├── E: dedicated virtual disk for shares
     │   ├── AD DS
-    │   ├── DNS
+    │   ├── DNS (Cloudflare 1.1.1.1 → Quad9 9.9.9.9 forwarders)
     │   └── SMB File Services (DoomVault)
     ├── Windows 11 client VM 01 (domain-joined)
     └── Windows 11 client VM 02 (domain-joined)
@@ -104,7 +89,7 @@
 Router
 └── DHCP reservation for the server IP address</pre>
       </div>
-      <p class="tech-note" style="margin-top:12px;">The domain controller and file server share one server because of local hardware limits. This is for the lab only, not a production design.</p>
+      <p class="tech-note">The domain controller and file server share one server because of local hardware limits. This is for the lab only, not a production design.</p>
     </section>
 
     <section class="section reveal">
@@ -144,5 +129,9 @@ Router
       -->
     <!-- </section> -->
   </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Active Directory Lab Portfolio. All content is educational and simulated.</p>
+  </footer>
 </body>
 </html>

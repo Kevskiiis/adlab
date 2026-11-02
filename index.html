@@ -12,6 +12,7 @@
   <script src="assets/js/main.js" defer></script>
 </head>
 <body>
+  <a class="sr-only" href="#main">Skip to main content</a>
   <header class="site-header">
     <a class="brand" href="index.html">
       <div class="brand-mark">IT</div>
@@ -28,22 +29,21 @@
     </nav>
   </header>
 
-  <main class="page-width">
+  <main id="main" class="page-width">
     <section class="doc-header">
-      <!-- <p class="doc-kicker">Technical Portfolio Overview</p> -->
       <h1>Overview</h1>
-      <p class="doc-summary">This lab simulates the IT environment of Flux Comics, a fictional comic publishing and retail company with ten employees across four departments. I designed and maintain it to practice hands-on Windows infrastructure administration, focusing on Active Directory Domain Services (AD DS), Domain Name System (DNS), security group-based access control, Server Message Block (SMB) file services, and Group Policy Object (GPO) administration.</p>
+      <p class="doc-summary">This lab simulates the IT environment of Flux Comics, a fictional comic publishing and retail company. I built it to practice hands-on Windows infrastructure administration across identity, file services, endpoint controls, and networked systems.</p>
     </section>
 
     <section class="section reveal">
       <div class="section-title"><h2>Lab Scope and Data Disclaimer</h2></div>
       <div class="tech-note">
-        Flux Comics isn’t a real company. I made it up just for this Active Directory and Windows lab. All the employees, user accounts, departments, job titles, organizational details, and file server contents are simulated. I’m not using any real employee information, company records, customer data, or confidential business information. The domain <code>ad.comics.internal</code> only exists in my isolated lab.
+        Flux Comics is fictional. Employees, departments, directory objects, and file contents are simulated for educational and portfolio demonstration only. The domain <code>ad.comics.internal</code> exists only inside the isolated lab.
       </div>
     </section>
 
     <section class="section reveal">
-      <div class="section-title"><h2>Lab Environment Summary</h2></div>
+      <div class="section-title"><h2>Lab Environment</h2></div>
       <div class="environment-group">
         <h3>Platform</h3>
         <div class="table-wrap">
@@ -52,46 +52,8 @@
               <tr><th scope="row">Hypervisor</th><td>VMware Workstation Pro</td></tr>
               <tr><th scope="row">Server</th><td>Windows Server 2025 (single Virtual Machine)</td></tr>
               <tr><th scope="row">Clients</th><td>Two Windows 11 Virtual Machines, domain-joined</td></tr>
-              <tr><th scope="row">Network</th><td>Custom VMnet for the lab</td></tr>
+              <tr><th scope="row">Network</th><td>Custom VMnet with bridged connectivity</td></tr>
               <tr><th scope="row">Server addressing</th><td>IP address reserved through a DHCP reservation on a router</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="environment-group">
-        <h3>Directory and Identity</h3>
-        <div class="table-wrap">
-          <table class="table-tech">
-            <tbody>
-              <tr><th scope="row">Domain</th><td><code>ad.comics.internal</code> (single forest, single domain)</td></tr>
-              <tr><th scope="row">Roles</th><td>AD DS and DNS</td></tr>
-              <tr><th scope="row">Structure</th><td>OUs separating users, workstations, servers, and groups</td></tr>
-              <tr><th scope="row">Accounts</th><td>Ten fictional employees across four departments</td></tr>
-              <tr><th scope="row">Access model</th><td>I have created a few security groups to control access to resources, such as SMB shares, for now.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="environment-group">
-        <h3>File Services</h3>
-        <div class="table-wrap">
-          <table class="table-tech">
-            <tbody>
-              <tr><th scope="row">Share</th><td>DoomVault at <code>E:\shares</code></td></tr>
-              <tr><th scope="row">Controls</th><td>NTFS folder permissions, SMB encryption in transit, and Access-Based Enumeration</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="environment-group">
-        <h3>Endpoint Management</h3>
-        <div class="table-wrap">
-          <table class="table-tech">
-            <tbody>
-              <tr><th scope="row">Group Policy</th><td>A few Group Policy Objects (five currently), all focused on computer security. I'm improving them and will add user policies very soon, following the principle of least privilege.</td></tr>
             </tbody>
           </table>
         </div>
@@ -111,13 +73,13 @@
 
     <section class="section reveal">
       <div class="section-title"><h2>Technical Documentation Areas</h2></div>
-      <p class="section-summary">Each page documents one implementation area with scope, configuration details, and status.</p>
+      <p class="section-summary">Follow the implementation from the platform it runs on to the identity, access, file-service, and endpoint controls built on top of it.</p>
       <div class="page-links">
-        <a class="page-link" href="pages/infrastructure.html"><h3>Infrastructure</h3><p>Server role design, topology, and lab-specific deployment constraints.</p></a>
-        <a class="page-link" href="pages/active-directory.html"><h3>Active Directory</h3><p>OU hierarchy, directory object organization, and policy-scoping model.</p></a>
-        <a class="page-link" href="pages/identity-access.html"><h3>Identity and Access</h3><p>User accounts, security group strategy, and access mapping model.</p></a>
-        <a class="page-link" href="pages/file-server.html"><h3>File Server</h3><p>DoomVault configuration, SMB and NTFS control model, and ABE usage.</p></a>
-        <a class="page-link" href="pages/group-policy.html"><h3>Group Policy</h3><p>Configured GPOs, scope boundaries, endpoint behavior, and remaining work.</p></a>
+        <a class="page-link" href="pages/infrastructure.html"><h3>Infrastructure</h3><p>Where the lab runs: virtualization, network, server roles, storage, and constraints.</p></a>
+        <a class="page-link" href="pages/active-directory.html"><h3>Active Directory</h3><p>How the domain organizes users, groups, servers, workstations, and policy scope.</p></a>
+        <a class="page-link" href="pages/identity-access.html"><h3>Identity and Access</h3><p>Who is represented in the lab and how group membership maps to access.</p></a>
+        <a class="page-link" href="pages/file-server.html"><h3>File Server</h3><p>What users access through DoomVault and how SMB, NTFS, and ABE work together.</p></a>
+        <a class="page-link" href="pages/group-policy.html"><h3>Group Policy</h3><p>How centralized endpoint controls are scoped, applied, and validated.</p></a>
       </div>
     </section>
 
@@ -132,7 +94,6 @@
             <li>Ten fictional user accounts aligned to four departments.</li>
             <li>DoomVault SMB share with folder segmentation and NTFS control model.</li>
             <li>SMB encryption in transit and Access-Based Enumeration (ABE).</li>
-            <li>Initial GPO set for endpoint hardening controls.</li>
           </ul>
         </article>
         <article class="status-card in-progress">
@@ -140,7 +101,7 @@
           <ul>
             <li>Security group membership completion and effective access validation.</li>
             <li>Cross-department file access verification against expected permissions.</li>
-            <li>Additional user and computer GPO development.</li>
+            <li>Additional GPO policy coverage for computers and users.</li>
           </ul>
         </article>
         <article class="status-card planned">
@@ -157,7 +118,7 @@
 
   <footer class="site-footer page-width">
     <div class="footer-stack">
-      <p class="footer-meta">© 2026 Kevskiiis · IT Project Documentation · Active Development</p>
+      <p class="footer-meta">© 2026 Active Directory Lab Portfolio. All content is educational and simulated.</p>
     </div>
   </footer>
 </body>

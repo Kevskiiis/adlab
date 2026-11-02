@@ -29,8 +29,7 @@
 
   <main id="main" class="page-width">
     <section class="doc-header">
-      <p class="doc-kicker">Report</p>
-      <h1>User Administration and Security Group Membership Model</h1>
+      <h1>Identity and Access</h1>
       <p class="doc-summary">This page covers the lab's user accounts, security groups, and how group membership maps to resource access.</p>
     </section>
 
@@ -38,7 +37,7 @@
       <div class="section-title"><h2>Summary</h2></div>
       <ul class="list">
         <li>Ten fictional accounts across four departments.</li>
-        <li>Access is granted through global security groups instead of individual user permissions.</li>
+        <li>Access is organized through security group membership instead of individual user permissions.</li>
         <li>Security groups follow the <code>&lt;Type&gt;_&lt;Resource&gt;_&lt;Role&gt;</code> naming pattern. SMB folder groups use <code>G_&lt;Resource&gt;_Read</code> / <code>G_&lt;Resource&gt;_Modify</code>.</li>
         <li>Security group membership and effective access validation are in progress.</li>
       </ul>
@@ -63,18 +62,15 @@
     <section class="section reveal">
       <div class="section-title"><h2>Security Group Design and Access Mapping</h2></div>
 
-      <h3 style="margin-top: 16px; margin-bottom: 10px;">Access Model</h3>
+      <h3 class="subsection-title">Access Model</h3>
       <div class="diagram">
         <span class="diagram-label">Access Evaluation Flow</span>
 <pre>User account
 └── Security group (&lt;Type&gt;_&lt;Resource&gt;_&lt;Role&gt;)
-    └── NTFS permission on the folder
-
-SMB share permission: Everyone
-Effective restriction: NTFS permissions and security group membership</pre>
+  └── Resource permission</pre>
       </div>
 
-      <h3 style="margin-top: 20px; margin-bottom: 10px;">Group Structure and Naming Pattern</h3>
+      <h3 class="subsection-title">Group Structure and Naming Pattern</h3>
       <div class="table-wrap">
         <table class="table-tech">
           <tbody>
@@ -86,23 +82,23 @@ Effective restriction: NTFS permissions and security group membership</pre>
         </table>
       </div>
 
-      <h3 style="margin-top: 20px; margin-bottom: 10px;">SMB Share Implementation</h3>
+      <h3 class="subsection-title">Implementation Example</h3>
       <div class="table-wrap">
         <table class="table-tech">
           <tbody>
             <tr><th scope="row">Pattern example</th><td><code>G_Company_Read</code> and <code>G_Company_Modify</code></td></tr>
-            <tr><th scope="row">Folders protected</th><td>Company, IT Software, Management, Publishing Creative, and Retail Operations</td></tr>
-            <tr><th scope="row">Implementation</th><td>Global security groups with Read and Modify roles control access to DoomVault SMB root folders.</td></tr>
+            <tr><th scope="row">Current use</th><td>These Global groups are an implementation of the broader naming pattern for resource access.</td></tr>
+            <tr><th scope="row">Detailed enforcement</th><td>DoomVault permissions and folder enforcement are documented on the File Server page.</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3 style="margin-top: 20px; margin-bottom: 10px;">Implementation Details</h3>
+      <h3 class="subsection-title">Implementation Details</h3>
       <div class="grid-2">
-        <article class="panel"><h4 style="margin-top: 0;">Flexible structure</h4><p>The <code>&lt;Type&gt;_&lt;Resource&gt;_&lt;Role&gt;</code> naming pattern supports security groups across all resources in the environment, not limited to SMB shares.</p></article>
-        <article class="panel"><h4 style="margin-top: 0;">Group-based access</h4><p>Security groups of various types control access to resources instead of permissions being applied directly to user objects.</p></article>
-        <article class="panel"><h4 style="margin-top: 0;">SMB deployment status</h4><p>Global security groups with Read and Modify roles have been created for the DoomVault SMB root folders.</p></article>
-        <article class="panel"><h4 style="margin-top: 0;">Validation</h4><p>Security group membership completion and effective access validation are still in progress.</p></article>
+        <article class="panel"><h4>Flexible structure</h4><p>The <code>&lt;Type&gt;_&lt;Resource&gt;_&lt;Role&gt;</code> naming pattern supports security groups across all resources in the environment.</p></article>
+        <article class="panel"><h4>Group-based access</h4><p>Security groups control access to resources instead of permissions being applied directly to user objects.</p></article>
+        <article class="panel"><h4>Current deployment</h4><p>Global security groups with Read and Modify roles have been created for DoomVault resource access.</p></article>
+        <article class="panel"><h4>Validation</h4><p>Security group membership completion and effective access validation are still in progress.</p></article>
       </div>
     </section>
 
@@ -180,5 +176,9 @@ Effective restriction: NTFS permissions and security group membership</pre>
     </section>
     -->
   </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Active Directory Lab Portfolio. All content is educational and simulated.</p>
+  </footer>
 </body>
 </html>

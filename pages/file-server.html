@@ -29,8 +29,7 @@
 
   <main id="main" class="page-width">
     <section class="doc-header">
-      <p class="doc-kicker">Report</p>
-      <h1>DoomVault SMB and NTFS Access Architecture</h1>
+      <h1>File Server</h1>
       <p class="doc-summary">This page covers the DoomVault file share, its folder structure, and how SMB, NTFS, security groups, and Access-Based Enumeration control access.</p>
     </section>
 
@@ -56,7 +55,6 @@
             <tr><th scope="row">ABE state</th><td>Enabled</td></tr>
             <tr><th scope="row">Folder-level control</th><td>NTFS access control entries (ACEs)</td></tr>
             <tr><th scope="row">Hosted on</th><td>Windows Server 2025 VM, dedicated virtual disk (E:)</td></tr>
-            <tr><th scope="row">Access groups</th><td>Global security groups named G_&lt;Resource&gt;_Read and G_&lt;Resource&gt;_Modify</td></tr>
           </tbody>
         </table>
       </div>
@@ -73,24 +71,12 @@
 ├── Publishing Creative
 └── Retail Operations</pre>
       </div>
-      <div class="table-wrap" style="margin-top: 14px;">
-        <table class="table-tech">
-          <thead><tr><th scope="col">Folder</th><th scope="col">Matching groups</th></tr></thead>
-          <tbody>
-            <tr><td>Company</td><td><code>G_Company_Read</code> and <code>G_Company_Modify</code></td></tr>
-            <tr><td>IT Software</td><td>Read and modify groups follow the same naming pattern</td></tr>
-            <tr><td>Management</td><td>Read and modify groups follow the same naming pattern</td></tr>
-            <tr><td>Publishing Creative</td><td>Read and modify groups follow the same naming pattern</td></tr>
-            <tr><td>Retail Operations</td><td>Read and modify groups follow the same naming pattern</td></tr>
-          </tbody>
-        </table>
-      </div>
     </section>
 
     <section class="section reveal">
       <div class="section-title"><h2>Access Control Model</h2></div>
 
-      <h3 style="margin-top: 16px; margin-bottom: 10px;">Access Request Path</h3>
+      <h3 class="subsection-title">Access Request Path</h3>
       <div class="diagram">
         <span class="diagram-label">Access Request Flow</span>
 <pre>User connects over SMB
@@ -99,17 +85,16 @@
         └── Access-Based Enumeration controls folder visibility</pre>
       </div>
 
-      <h3 style="margin-top: 20px; margin-bottom: 10px;">Implementation Details</h3>
+      <h3 class="subsection-title">Implementation Details</h3>
       <div class="grid-2">
-        <article class="panel"><h4 style="margin-top: 0;">SMB connectivity</h4><p>Users connect to the DoomVault share over SMB. The share permission includes Everyone, allowing the connection attempt to proceed.</p></article>
-        <article class="panel"><h4 style="margin-top: 0;">NTFS enforcement</h4><p>NTFS permissions tied to security groups determine actual access to folders and files. Users must be members of the appropriate G_&lt;Resource&gt;_Read or G_&lt;Resource&gt;_Modify group to access folder content.</p></article>
-        <article class="panel"><h4 style="margin-top: 0;">Visibility control</h4><p>Access-Based Enumeration hides folders for which a user lacks access rights, reducing visible attack surface and navigation noise.</p></article>
-        <article class="panel"><h4 style="margin-top: 0;">Validation status</h4><p>Security group membership completion and effective access validation are in progress.</p></article>
+        <article class="panel"><h4>SMB connectivity</h4><p>Users connect to the DoomVault share over SMB. The share permission includes Everyone, allowing the connection attempt to proceed.</p></article>
+        <article class="panel"><h4>NTFS enforcement</h4><p>NTFS permissions tied to security group membership determine actual access to folders and files.</p></article>
+        <article class="panel"><h4>Visibility control</h4><p>Access-Based Enumeration hides folders for which a user lacks access rights, reducing visible attack surface and navigation noise.</p></article>
+        <article class="panel"><h4>Validation status</h4><p>Security group membership completion and effective access validation are in progress.</p></article>
       </div>
 
-      <h3 style="margin-top: 20px; margin-bottom: 10px;">Security Notes</h3>
-      <p style="font-size: 0.95rem; color: var(--ink-soft);">Current share-level permission includes <code>Everyone</code>. Effective security is enforced through NTFS controls and security group membership, which work together to constrain network access. The Everyone share permission does not replace the NTFS controls.</p>
-      <p style="margin-top: 10px; font-size: 0.95rem; color: var(--ink-soft);">All file content in this environment is simulated data used for educational and portfolio demonstration only.</p>
+      <h3 class="subsection-title">Security Notes</h3>
+      <p class="muted-note">Current share-level permission includes <code>Everyone</code>. Effective security is enforced through NTFS controls and security group membership, which work together to constrain network access.</p>
     </section>
 
     <section class="section reveal">
@@ -161,6 +146,10 @@
     </section>
     -->
   </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Active Directory Lab Portfolio. All content is educational and simulated.</p>
+  </footer>
 
 </body>
 </html>
